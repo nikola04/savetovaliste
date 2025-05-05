@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<form xmlns="http://www.intellij.com/uidesigner/form/" version="1" bind-to-class="savetovaliste.gui.view.forms.PsihoInfoForm">
+  <grid id="27dc6" binding="panel1" default-binding="true" layout-manager="BorderLayout" hgap="0" vgap="0">
+    <constraints>
+      <xy x="20" y="20" width="600" height="400"/>
+    </constraints>
+    <properties>
+      <minimumSize width="600" height="400"/>
+    </properties>
+    <border type="none"/>
+    <children>
+      <component id="91ea0" class="javax.swing.JButton" binding="refreshBtn">
+        <constraints border-constraint="North"/>
+        <properties>
+          <text value="Refresh"/>
+        </properties>
+      </component>
+      <scrollpane id="190bf">
+        <constraints border-constraint="Center"/>
+        <properties/>
+        <border type="none"/>
+        <children>
+          <component id="b88bc" class="javax.swing.JTable" binding="psihoTable">
+            <constraints/>
+            <properties/>
+          </component>
+        </children>
+      </scrollpane>
+    </children>
+  </grid>
+  <inspectionSuppressions>
+    <suppress inspection="NoLabelFor" id="190bf"/>
+  </inspectionSuppressions>
+</form>
