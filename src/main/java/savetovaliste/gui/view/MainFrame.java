@@ -37,11 +37,14 @@ public class MainFrame extends JFrame {
         JPanel desktop = new JPanel(new BorderLayout());
         this.getContentPane().add(desktop, BorderLayout.CENTER);
         desktop.add(showPsihoBtn, BorderLayout.SOUTH);
+
+        JFrame frame = new JFrame();
+        frame.setSize(920, 400);
+
         showPsihoBtn.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                JFrame frame = new JFrame();
-                PsihoInfoForm pane  = new PsihoInfoForm();
+                PsihoInfoForm pane = new PsihoInfoForm();
                 frame.add(pane.getPanel1(), BorderLayout.CENTER);
                 frame.setVisible(true);
             }
