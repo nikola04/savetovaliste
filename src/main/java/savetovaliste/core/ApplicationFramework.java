@@ -22,4 +22,7 @@ public class ApplicationFramework {
     public void setGui(GUI gui) {
         this.gui = gui;
     }
+    public GUI getGui() {
+        return gui;
+    }
 }

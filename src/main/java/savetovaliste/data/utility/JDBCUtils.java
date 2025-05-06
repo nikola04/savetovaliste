@@ -40,4 +40,21 @@ public class JDBCUtils {
 
         return struke;
     }
+
+
+    public static void RegisterPsihoterapeut(String ime, String prezime, String jmbg, String email, String telefon, Date mysqlDate, int brojSertifikata, int strukaId) throws SQLException{
+        String sql = "{CALL dodaj_psihoterapeuta(?, ?, ?, ?, ?, ?, ?, ?)}";
+        PreparedStatement stmt = DBUtil.getConnection().prepareStatement(sql);
+        stmt.setString(1, ime);
+        stmt.setString(2, prezime);
+        stmt.setString(3, jmbg);
+        stmt.setString(4, email);
+        stmt.setString(5, telefon);
+        stmt.setDate(6, mysqlDate);
+        stmt.setInt(7, brojSertifikata);
+        stmt.setInt(8, strukaId);
+        stmt.executeUpdate();
+        stmt.close();
+
+    }
 }

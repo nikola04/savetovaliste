@@ -1,13 +1,11 @@
 package savetovaliste.gui.view.forms;
 
-import org.jdatepicker.JDatePicker;
 import org.jdatepicker.impl.DateComponentFormatter;
 import org.jdatepicker.impl.JDatePanelImpl;
 import org.jdatepicker.impl.JDatePickerImpl;
 import org.jdatepicker.impl.UtilDateModel;
 import savetovaliste.data.models.Struka;
 import savetovaliste.data.utility.JDBCUtils;
-import savetovaliste.gui.view.DatePicker;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -20,7 +18,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Properties;
 
-public class SignInForm extends JFrame {
+public class SignUpForm extends JFrame {
     private JPanel contentPane;
     private JLabel lblIme;
     private JLabel lblPrezime;
@@ -36,11 +34,11 @@ public class SignInForm extends JFrame {
     private TextField txtEmail;
     private TextField txtTelefon;
     private JButton btnDate;
-    private TextField brojSertifikata;
+    private TextField txtbrojSertifikata;
     private JComboBox cbStruka;
     private JButton btn1;
 
-    public SignInForm() {
+    public SignUpForm() {
         setTitle("Sign In");
         Toolkit kit = Toolkit.getDefaultToolkit();
         Dimension screenSize = kit.getScreenSize();
@@ -76,7 +74,7 @@ public class SignInForm extends JFrame {
 
 
 
-        brojSertifikata = new TextField();
+        txtbrojSertifikata = new TextField();
         ArrayList<Struka> struke = JDBCUtils.SveStruke();
         cbStruka = new JComboBox(struke.toArray());
 
@@ -101,7 +99,7 @@ public class SignInForm extends JFrame {
         contentPane.add(lblDatumRodjenja);
         contentPane.add(datePicker);
         contentPane.add(lblBrojSertifikata);
-        contentPane.add(brojSertifikata);
+        contentPane.add(txtbrojSertifikata);
         contentPane.add(lblStruka);
         contentPane.add(cbStruka);
         contentPane.add(btn1);
@@ -111,15 +109,25 @@ public class SignInForm extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 Struka selektovana = (Struka) cbStruka.getSelectedItem();
-                System.out.println(selektovana.getId());
-                System.out.println(selektovana.getNaziv());
-
+                int strukaId = selektovana.getId();
+                String struka =selektovana.getNaziv();
+                String ime = txtIme.getText();
+                String prezime = txtPrezime.getText();
+                String jmbg = txtJmbg.getText();
+                String email = txtEmail.getText();
+                String telefon = txtTelefon.getText();
                 Date selectedDate = (Date) datePicker.getModel().getValue();
+                java.sql.Date mysqlDate = new java.sql.Date(selectedDate.getTime());
+                int brojSertifikata = Integer.parseInt(txtbrojSertifikata.getText());
 
-                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-                String mysqlDate = sdf.format(selectedDate);
 
                 System.out.println(mysqlDate);
+
+                try {
+                    JDBCUtils.RegisterPsihoterapeut(ime,prezime,jmbg,email,telefon,mysqlDate,brojSertifikata,strukaId);
+                } catch (SQLException ex) {
+                    throw new RuntimeException(ex);
+                }
             }
         });
 
