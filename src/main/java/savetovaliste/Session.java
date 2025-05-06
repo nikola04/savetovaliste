@@ -1,14 +1,14 @@
 package savetovaliste;
 
-import savetovaliste.core.ApplicationFramework;
 import savetovaliste.gui.view.MainFrame;
+import savetovaliste.model.Psihoterapeut;
 
 public class Session {
     private static Session instance;
-
     private int id = -1;
-    private Session() {}
+    private Psihoterapeut psihoterapeut;
 
+    private Session() {}
     public static Session getInstance() {
         if (instance == null) {
             instance = new Session();
@@ -16,11 +16,13 @@ public class Session {
         return instance;
     }
 
-    public void loginUser(int id){
-        setUserId(id);
+    public void loginUser(Psihoterapeut psihoterapeut){
+        this.psihoterapeut = psihoterapeut;
+        setUserId(psihoterapeut.getId());
     }
 
     public void logoutUser(){
+        this.psihoterapeut = null;
         setUserId(-1);
     }
 
@@ -31,5 +33,9 @@ public class Session {
 
     public int getUserId() {
         return id;
+    }
+
+    public Psihoterapeut getPsihoterapeut() {
+        return psihoterapeut;
     }
 }

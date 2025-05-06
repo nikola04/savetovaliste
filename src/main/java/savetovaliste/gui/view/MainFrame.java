@@ -22,16 +22,14 @@ public class MainFrame extends JFrame {
 
     public void onRefreshSession(){
         if(Session.getInstance().getUserId() == -1) {
-            this.setContentPane(mainScreenLogin);
-        }else this.setContentPane(mainScreenPsih);
+            this.setContentPane(MainScreen.getInstance());
+        }else this.setContentPane(MainScreenPsih.getInstance());
 
         this.revalidate();
         this.repaint();
     }
 
     public void initialize() {
-        mainScreenPsih = MainScreenPsih.getInstance();
-        mainScreenLogin = MainScreen.getInstance();
     }
 
     public void initializeGUI() {
@@ -46,6 +44,6 @@ public class MainFrame extends JFrame {
 
         setLayout(new BorderLayout());
 
-        this.setContentPane(mainScreenLogin);
+        this.setContentPane(MainScreen.getInstance());
     }
 }

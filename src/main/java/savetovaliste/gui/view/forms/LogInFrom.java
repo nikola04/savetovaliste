@@ -1,15 +1,14 @@
 package savetovaliste.gui.view.forms;
 
 import savetovaliste.Session;
-import savetovaliste.data.DBUtil;
 import savetovaliste.data.utility.JDBCUtils;
+import savetovaliste.model.Psihoterapeut;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
 public class LogInFrom extends JFrame {
@@ -40,6 +39,8 @@ public class LogInFrom extends JFrame {
         Dimension itemSize = new Dimension(Integer.MAX_VALUE, 30); // širina automatska, visina 30
 
         lbl1 = new JLabel("Prijava Psihoterapeuta");
+        lbl1.setFont(new Font("Arial", Font.BOLD, 18));
+        lbl1.setHorizontalAlignment(JLabel.CENTER);
         lbl2 = new JLabel("Email");
         lbl3 = new JLabel("JMBG");
         txt1 = new JTextField();
@@ -76,13 +77,13 @@ public class LogInFrom extends JFrame {
                     return;
                 }
                 try {
-                    int id = JDBCUtils.LoginPsihoterapeut(email, jmbg);
-                    if(id == -1) {
+                    Psihoterapeut psihoterapeut = JDBCUtils.LoginPsihoterapeut(email, jmbg);
+                    if(psihoterapeut == null) {
                         JOptionPane.showMessageDialog(null, "Korisnik nije pronađen.", "Greska", JOptionPane.ERROR_MESSAGE);
                         return;
                     }
-                    Session.getInstance().loginUser(id);
-                    JOptionPane.showMessageDialog(null, "Uspesna Prijava.", "Uspesno", JOptionPane.INFORMATION_MESSAGE);
+                    Session.getInstance().loginUser(psihoterapeut);
+//                    JOptionPane.showMessageDialog(null, "Uspesna Prijava.", "Uspesno", JOptionPane.INFORMATION_MESSAGE);
 
                     dispose();
 

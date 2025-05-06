@@ -4,7 +4,7 @@ import org.jdatepicker.impl.DateComponentFormatter;
 import org.jdatepicker.impl.JDatePanelImpl;
 import org.jdatepicker.impl.JDatePickerImpl;
 import org.jdatepicker.impl.UtilDateModel;
-import savetovaliste.data.models.Struka;
+import savetovaliste.model.Struka;
 import savetovaliste.data.utility.JDBCUtils;
 
 import javax.swing.*;

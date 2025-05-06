@@ -19,7 +19,7 @@ public class PsihoInfoForm {
         refreshBtn.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-
+                loadData();
             }
         });
     }
@@ -51,7 +51,6 @@ public class PsihoInfoForm {
             }psihoTable.setModel(model);
             rs.close();
             stmt.close();
-            conn.close();
         } catch (SQLException e) {
             e.printStackTrace();
         }

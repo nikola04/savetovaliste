@@ -1,15 +1,14 @@
 package savetovaliste.data.utility;
 
 import savetovaliste.data.DBUtil;
-import savetovaliste.data.models.Struka;
+import savetovaliste.model.Psihoterapeut;
+import savetovaliste.model.Struka;
 
-import javax.swing.*;
 import java.sql.*;
 import java.util.ArrayList;
-import java.util.List;
 
 public class JDBCUtils {
-    public static int LoginPsihoterapeut(String email, String jmbg) throws SQLException {
+    public static Psihoterapeut LoginPsihoterapeut(String email, String jmbg) throws SQLException {
         String sql = "SELECT * FROM psihoterapeut WHERE email = ? AND jmbg = ?";
         PreparedStatement stmt = DBUtil.getConnection().prepareStatement(sql);
         stmt.setString(1, email);
@@ -17,12 +16,22 @@ public class JDBCUtils {
 
         ResultSet rs = stmt.executeQuery();
 
-        int id = -1;
-        if (rs.next())
-            id = rs.getInt("psihoterapeut_id");
+        Psihoterapeut psihoterapeut = null;
+        if (rs.next()) {
+            int id = rs.getInt("psihoterapeut_id");
+            String ime = rs.getString("ime");
+            String prezime = rs.getString("prezime");
+            String jmbg1 = rs.getString("jmbg");
+            String email1 = rs.getString("email");
+            String telefon = rs.getString("telefon");
+            Date date = rs.getDate("datum_rodjenja");
+            int brojSertifikata = rs.getInt("sertifikat_id");
+            int strukaId = rs.getInt("struka_id");
+            psihoterapeut = new Psihoterapeut(id, ime, prezime, jmbg1, email1, telefon, date, brojSertifikata, strukaId);
+        }
         rs.close();
         stmt.close();
-        return id;
+        return psihoterapeut;
     }
 
     public static ArrayList<Struka> SveStruke() throws SQLException {
