@@ -13,12 +13,18 @@
         <maven.compiler.target>22</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
-    <!-- https://mvnrepository.com/artifact/com.mysql/mysql-connector-j -->
+
     <dependencies>
-    <dependency>
+        <dependency>
         <groupId>com.mysql</groupId>
         <artifactId>mysql-connector-j</artifactId>
         <version>9.2.0</version>
-    </dependency>
+        </dependency>
+
+        <dependency>
+            <groupId>org.jdatepicker</groupId>
+            <artifactId>jdatepicker</artifactId>
+            <version>1.3.4</version>
+        </dependency>
     </dependencies>
 </project>
