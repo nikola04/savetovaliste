@@ -32,6 +32,30 @@ public class JDBCUtils {
         stmt.close();
         return psihoterapeut;
     }
+    public static ArrayList<Psihoterapeut> getPsihoterapeuts() throws SQLException {
+        String sql = "SELECT * FROM psihoterapeut";
+        Statement stmt = DBUtil.getConnection().createStatement();
+        ResultSet rs = stmt.executeQuery(sql);
+        ArrayList<Psihoterapeut> psihoterapeuti = new ArrayList<>();
+
+
+        while (rs.next()) {
+            int id = rs.getInt("psihoterapeut_id");
+            String ime = rs.getString("ime");
+            String prezime = rs.getString("prezime");
+            String jmbg1 = rs.getString("jmbg");
+            String email1 = rs.getString("email");
+            String telefon = rs.getString("telefon");
+            Date date = rs.getDate("datum_rodjenja");
+            int brojSertifikata = rs.getInt("sertifikat_id");
+            int strukaId = rs.getInt("struka_id");
+            Psihoterapeut psihoterapeut = new Psihoterapeut(id, ime, prezime, jmbg1, email1, telefon, date, brojSertifikata, strukaId);
+            psihoterapeuti.add(psihoterapeut);
+        }
+        rs.close();
+        stmt.close();
+        return psihoterapeuti;
+    }
 
     public static ArrayList<Struka> SveStruke() throws SQLException {
         String sql = "SELECT * FROM struka";
@@ -45,7 +69,8 @@ public class JDBCUtils {
             String naziv = rs.getString("naziv");
             struke.add(new Struka(id, naziv));
         }
-
+        rs.close();
+        stmt.close();
         return struke;
     }
 
