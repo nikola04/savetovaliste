@@ -1,7 +1,7 @@
 package savetovaliste.model;
 
 
-import savetovaliste.data.utility.JDBCUtils;
+import savetovaliste.db.utility.JDBCUtils;
 
 import java.sql.SQLException;
 import java.util.Date;

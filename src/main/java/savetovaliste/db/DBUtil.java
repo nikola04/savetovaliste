@@ -1,4 +1,4 @@
-package savetovaliste.data;
+package savetovaliste.db;
 
 import java.sql.Connection;
 import java.sql.DriverManager;

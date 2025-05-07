@@ -1,7 +1,7 @@
 package savetovaliste.gui.view.forms;
 
 import savetovaliste.Session;
-import savetovaliste.data.utility.JDBCUtils;
+import savetovaliste.db.utility.JDBCUtils;
 import savetovaliste.model.Psihoterapeut;
 
 import javax.swing.*;

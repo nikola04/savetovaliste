@@ -1,6 +1,6 @@
-package savetovaliste.data.utility;
+package savetovaliste.db.utility;
 
-import savetovaliste.data.DBUtil;
+import savetovaliste.db.DBUtil;
 import savetovaliste.model.Oblast;
 import savetovaliste.model.Psihoterapeut;
 import savetovaliste.model.Sertifikat;

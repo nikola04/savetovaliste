@@ -1,6 +1,6 @@
 package savetovaliste.gui.view.forms;
 
-import savetovaliste.data.DBUtil;
+import savetovaliste.db.DBUtil;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;

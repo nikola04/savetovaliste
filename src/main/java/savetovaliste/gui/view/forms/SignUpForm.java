@@ -5,17 +5,13 @@ import org.jdatepicker.impl.JDatePanelImpl;
 import org.jdatepicker.impl.JDatePickerImpl;
 import org.jdatepicker.impl.UtilDateModel;
 import savetovaliste.Session;
-import savetovaliste.model.Psihoterapeut;
 import savetovaliste.model.Struka;
-import savetovaliste.data.utility.JDBCUtils;
+import savetovaliste.db.utility.JDBCUtils;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.sql.SQLException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Properties;
