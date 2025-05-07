@@ -95,7 +95,6 @@ public class ProfileScreen extends JPanel implements ISubscriber {
         add(panel, BorderLayout.CENTER);
     }
 
-    // Pomoćna metoda za dodavanje redova
     private void addRow(JPanel panel, GridBagConstraints gbc, int row, JLabel label, JLabel value) {
         gbc.gridx = 0;
         gbc.gridy = row;

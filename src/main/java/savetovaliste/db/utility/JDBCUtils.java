@@ -1,10 +1,7 @@
 package savetovaliste.db.utility;
 
 import savetovaliste.db.DBUtil;
-import savetovaliste.model.Oblast;
-import savetovaliste.model.Psihoterapeut;
-import savetovaliste.model.Sertifikat;
-import savetovaliste.model.Struka;
+import savetovaliste.model.*;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -68,6 +65,36 @@ public class JDBCUtils {
         rs.close();
         stmt.close();
         return sertifikat;
+    }
+
+    public static ArrayList<Prijava> PsihoterapeutPrijave(Psihoterapeut psihoterapeut) throws SQLException {
+        ArrayList<Prijava> prijave = new ArrayList<>();
+        String sql = "SELECT prijava.prijava_id as prijava_id, klijent_id, ime, prezime, datum_rodjenja, pol, email, broj, ranije_terapije FROM klijent INNER JOIN prijava ON prijava.prijava_id = klijent.prijava_id WHERE prijava.psihoterapeut_id = ?";
+        PreparedStatement stmt = DBUtil.getConnection().prepareStatement(sql);
+        stmt.setInt(1, psihoterapeut.getId());
+        ResultSet rs = stmt.executeQuery();
+
+        while (rs.next()) {
+            int prijavaId = rs.getInt("prijava_id");
+            int klijentId = rs.getInt("klijent_id");
+            String ime = rs.getString("ime");
+            String prezime = rs.getString("prezime");
+            Date datumRodjenja = rs.getDate("datum_rodjenja");
+            String pol = rs.getString("pol");
+            String email = rs.getString("email");
+            String broj = rs.getString("broj");
+            boolean ranijeTerapije = rs.getBoolean("ranije_terapije");
+
+            Klijent klijent = new Klijent(klijentId, ime, prezime, email, broj, pol, datumRodjenja, ranijeTerapije);
+            Prijava prijava = new Prijava(prijavaId, klijent, psihoterapeut);
+            klijent.setPrijava(prijava);
+
+            prijave.add(prijava);
+        }
+
+        rs.close();
+        stmt.close();
+        return prijave;
     }
 
     public static int RegisterPsihoterapeut(String ime, String prezime, String jmbg, String email, String telefon, Date mysqlDate, int brojSertifikata, int strukaId) throws SQLException{

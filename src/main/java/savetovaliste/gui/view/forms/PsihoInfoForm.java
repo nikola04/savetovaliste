@@ -48,7 +48,8 @@ public class PsihoInfoForm {
                 Date date = rs.getDate("datum_rodjenja");
 
                 model.addRow(new Object[]{id, ime, prezime, jmbg,email, telefon, date});
-            }psihoTable.setModel(model);
+            }
+            psihoTable.setModel(model);
             rs.close();
             stmt.close();
         } catch (SQLException e) {
