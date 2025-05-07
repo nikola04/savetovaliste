@@ -53,7 +53,7 @@ public class JDBCUtils {
     }
 
     public static Sertifikat GetSertifikat(int sertifikatId) throws SQLException {
-        String sql = "SELECT datum_sertifikata, sertifikat.oblasti_id as oblast_id, naziv as oblast_naziv FROM sertifikat INNER JOIN oblast ON oblast.oblasti_id = sertifikat.oblasti_id WHERE sertifikat_id = ?";
+        String sql = "SELECT datum_sertifikata, sertifikat.oblasti_id as oblast_id, naziv as oblast_naziv FROM sertifikat INNER JOIN oblasti_psihoterapije ON oblasti_psihoterapije.oblasti_id = sertifikat.oblasti_id WHERE sertifikat_id = ?";
         PreparedStatement stmt = DBUtil.getConnection().prepareStatement(sql);
         stmt.setInt(1, sertifikatId);
         ResultSet rs = stmt.executeQuery();
