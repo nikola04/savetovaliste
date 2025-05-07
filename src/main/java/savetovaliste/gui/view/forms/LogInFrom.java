@@ -23,9 +23,7 @@ public class LogInFrom extends JFrame {
     private JTextField txt2;
     public LogInFrom() {
         setTitle("Log In");
-        Toolkit kit = Toolkit.getDefaultToolkit();
-        Dimension screenSize = kit.getScreenSize();
-        setSize(400,400);
+        setSize(320,400);
         setVisible(true);
         init();
     }
@@ -62,7 +60,7 @@ public class LogInFrom extends JFrame {
         contentPane.add(Box.createVerticalStrut(10));
         contentPane.add(lbl3);
         contentPane.add(txt2);
-        contentPane.add(Box.createVerticalStrut(10));
+        contentPane.add(Box.createVerticalStrut(20));
         contentPane.add(btn1);
         btn1.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -99,7 +97,7 @@ public class LogInFrom extends JFrame {
         comp.setMaximumSize(size);
         comp.setPreferredSize(size);
         comp.setMinimumSize(size);
-        comp.setAlignmentX(Component.LEFT_ALIGNMENT); // da ne bude centrirano
+        comp.setAlignmentX(Component.CENTER_ALIGNMENT);
     }
 
 }

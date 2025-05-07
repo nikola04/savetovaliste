@@ -1,6 +1,9 @@
 package savetovaliste.model;
 
 
+import savetovaliste.data.utility.JDBCUtils;
+
+import java.sql.SQLException;
 import java.util.Date;
 
 public class Psihoterapeut {
@@ -13,6 +16,7 @@ public class Psihoterapeut {
     private Date datumRodjenja;
     private int sertifikatId;
     private int strukaId;
+    private Sertifikat sertifikat;
 
     public Psihoterapeut(int id, String ime, String prezime, String jmbg, String email, String telefon, Date datumRodjenja, int sertifikatId, int strukaId) {
         this.id = id;
@@ -30,8 +34,23 @@ public class Psihoterapeut {
         return id;
     }
 
-    public int getSertifikatId() {
-        return sertifikatId;
+    public boolean fetchSertifikat(){
+        try{
+            this.sertifikat = JDBCUtils.GetSertifikat(this.sertifikatId);
+            return true;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public Sertifikat getSertifikat(){
+        if(sertifikat != null)
+            return sertifikat;
+        if(fetchSertifikat())
+            return sertifikat;
+
+        return null;
     }
 
     public String getIme() {

@@ -4,6 +4,8 @@ import org.jdatepicker.impl.DateComponentFormatter;
 import org.jdatepicker.impl.JDatePanelImpl;
 import org.jdatepicker.impl.JDatePickerImpl;
 import org.jdatepicker.impl.UtilDateModel;
+import savetovaliste.Session;
+import savetovaliste.model.Psihoterapeut;
 import savetovaliste.model.Struka;
 import savetovaliste.data.utility.JDBCUtils;
 
@@ -20,6 +22,7 @@ import java.util.Properties;
 
 public class SignUpForm extends JFrame {
     private JPanel contentPane;
+    private JLabel lblHeading;
     private JLabel lblIme;
     private JLabel lblPrezime;
     private JLabel lblJmbg;
@@ -28,13 +31,13 @@ public class SignUpForm extends JFrame {
     private JLabel lblDatumRodjenja;
     private JLabel lblBrojSertifikata;
     private JLabel lblStruka;
-    private TextField txtIme;
-    private TextField txtPrezime;
-    private TextField txtJmbg;
-    private TextField txtEmail;
-    private TextField txtTelefon;
-    private JButton btnDate;
-    private TextField txtbrojSertifikata;
+    private JTextField txtIme;
+    private JTextField txtPrezime;
+    private JTextField txtJmbg;
+    private JTextField txtEmail;
+    private JTextField txtTelefon;
+    JDatePickerImpl datePicker;
+    private JTextField txtbrojSertifikata;
     private JComboBox cbStruka;
     private JButton btn1;
 
@@ -46,6 +49,7 @@ public class SignUpForm extends JFrame {
         setVisible(true);
         try {
             init();
+            initControllers();
         }catch (SQLException e) {
             e.printStackTrace();
         }
@@ -54,9 +58,21 @@ public class SignUpForm extends JFrame {
     private void init() throws SQLException {
         contentPane = new JPanel();
         contentPane.setBorder(new EmptyBorder(10, 10, 10, 10));
-        contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.Y_AXIS));
+        contentPane.setLayout(new BorderLayout());
         setContentPane(contentPane);
-        btn1 = new JButton("Sign in");
+
+        lblHeading = new JLabel("Registracija Psihoterapeuta");
+        lblHeading.setFont(new Font("Arial", Font.BOLD, 18));
+        lblHeading.setHorizontalAlignment(JLabel.CENTER);
+        contentPane.add(lblHeading, BorderLayout.NORTH);
+
+        JPanel formPanel = new JPanel(new GridBagLayout());
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(5, 0, 0, 0);
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.weightx = 1.0;
+
         lblIme = new JLabel("Ime");
         lblPrezime = new JLabel("Prezime");
         lblJmbg = new JLabel("Jmbg");
@@ -65,71 +81,98 @@ public class SignUpForm extends JFrame {
         lblDatumRodjenja = new JLabel("Datum Rodjenja");
         lblBrojSertifikata = new JLabel("Broj Sertifikata");
         lblStruka = new JLabel("Struka");
-        txtIme = new TextField();
-        txtPrezime = new TextField();
-        txtJmbg = new TextField();
-        txtEmail = new TextField();
-        txtTelefon = new TextField();
-        btnDate = new JButton("Izaberi datum rodjenja");
 
+        txtIme = new JTextField();
+        txtPrezime = new JTextField();
+        txtJmbg = new JTextField();
+        txtEmail = new JTextField();
+        txtTelefon = new JTextField();
+        txtbrojSertifikata = new JTextField();
 
-
-        txtbrojSertifikata = new TextField();
-        ArrayList<Struka> struke = JDBCUtils.SveStruke();
-        cbStruka = new JComboBox(struke.toArray());
+        btn1 = new JButton("Sign up");
 
         Properties pr = new Properties();
         pr.put("text.today", "Danas");
         pr.put("text.month", "Mesec");
         pr.put("text.year", "Godina");
-
         UtilDateModel model = new UtilDateModel();
         JDatePanelImpl datePanel = new JDatePanelImpl(model, pr);
-        JDatePickerImpl datePicker = new JDatePickerImpl(datePanel, new DateComponentFormatter());
-        contentPane.add(lblIme);
-        contentPane.add(txtIme);
-        contentPane.add(lblPrezime);
-        contentPane.add(txtPrezime);
-        contentPane.add(lblJmbg);
-        contentPane.add(txtJmbg);
-        contentPane.add(lblEmail);
-        contentPane.add(txtEmail);
-        contentPane.add(lblTelefon);
-        contentPane.add(txtTelefon);
-        contentPane.add(lblDatumRodjenja);
-        contentPane.add(datePicker);
-        contentPane.add(lblBrojSertifikata);
-        contentPane.add(txtbrojSertifikata);
-        contentPane.add(lblStruka);
-        contentPane.add(cbStruka);
-        contentPane.add(btn1);
+        datePicker = new JDatePickerImpl(datePanel, new DateComponentFormatter());
 
+        ArrayList<Struka> struke = JDBCUtils.SveStruke();
+        cbStruka = new JComboBox(struke.toArray());
 
-        btn1.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                Struka selektovana = (Struka) cbStruka.getSelectedItem();
-                int strukaId = selektovana.getId();
-                String struka =selektovana.getNaziv();
-                String ime = txtIme.getText();
-                String prezime = txtPrezime.getText();
-                String jmbg = txtJmbg.getText();
-                String email = txtEmail.getText();
-                String telefon = txtTelefon.getText();
-                Date selectedDate = (Date) datePicker.getModel().getValue();
-                java.sql.Date mysqlDate = new java.sql.Date(selectedDate.getTime());
-                int brojSertifikata = Integer.parseInt(txtbrojSertifikata.getText());
+        int row = 0;
+        Component[][] fields = {
+                {lblIme, txtIme},
+                {lblPrezime, txtPrezime},
+                {lblJmbg, txtJmbg},
+                {lblEmail, txtEmail},
+                {lblTelefon, txtTelefon},
+                {lblDatumRodjenja, datePicker},
+                {lblBrojSertifikata, txtbrojSertifikata},
+                {lblStruka, cbStruka}
+        };
 
+        for (Component[] pair : fields) {
+            gbc.gridx = 0; gbc.gridy = row++;
+            formPanel.add(pair[0], gbc);
 
-                System.out.println(mysqlDate);
+            gbc.gridx = 0; gbc.gridy = row++;
+            formPanel.add(pair[1], gbc);
+        }
 
-                try {
-                    JDBCUtils.RegisterPsihoterapeut(ime,prezime,jmbg,email,telefon,mysqlDate,brojSertifikata,strukaId);
-                } catch (SQLException ex) {
-                    throw new RuntimeException(ex);
+        gbc.gridx = 0; gbc.gridy = row++;
+        gbc.insets = new Insets(15, 0, 0, 0);
+        gbc.anchor = GridBagConstraints.CENTER;
+        formPanel.add(btn1, gbc);
+
+        contentPane.add(formPanel, BorderLayout.CENTER);
+    }
+
+    private void initControllers() {
+        btn1.addActionListener(_ -> {
+            Struka selektovanaStruka = (Struka) cbStruka.getSelectedItem();
+            if(selektovanaStruka == null) {
+                JOptionPane.showMessageDialog(null, "Morate izabrati struku.", "Greska", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            int strukaId = selektovanaStruka.getId();
+            String ime = txtIme.getText();
+            String prezime = txtPrezime.getText();
+            String jmbg = txtJmbg.getText();
+            String email = txtEmail.getText();
+            String telefon = txtTelefon.getText();
+            Date selectedDate = (Date) datePicker.getModel().getValue();
+            java.sql.Date mysqlDate = new java.sql.Date(selectedDate.getTime());
+            int brojSertifikata = Integer.parseInt(txtbrojSertifikata.getText());
+
+            System.out.println(mysqlDate);
+
+            try {
+                int success = JDBCUtils.RegisterPsihoterapeut(ime,prezime,jmbg,email,telefon,mysqlDate,brojSertifikata,strukaId);
+                if(success == 0) {
+                    JOptionPane.showMessageDialog(null, "Uspesna registracija.", "Uspesno", JOptionPane.INFORMATION_MESSAGE);
+                    dispose();
+                    Session.getInstance().logoutUser();
+                    new LogInFrom();
+                    return;
                 }
+                if(success == -1) {
+                    JOptionPane.showMessageDialog(null, "JMBG je vec registrovan.", "Psihoterapeut je vec registrovan", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+                if(success == -2) {
+                    JOptionPane.showMessageDialog(null, "Email adresa je vec registrovan.", "Psihoterapeut je vec registrovan", JOptionPane.ERROR_MESSAGE);
+                }
+                if(success == -3) {
+                    JOptionPane.showMessageDialog(null, "Broj sertifikata je vec registrovan.", "Broj sertifikata je vec registrovan", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+                JOptionPane.showMessageDialog(null, "Desila se greska prilikom unosa. Molimo vas pokusajte ponovo.", "Greska", JOptionPane.ERROR_MESSAGE);
+            } catch (SQLException ex) {
+                throw new RuntimeException(ex);
             }
         });
-
     }
 }

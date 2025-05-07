@@ -36,7 +36,7 @@ public class MainScreen extends JPanel {
 
         logInBtn = new Button("Log in");
 
-        signUpBtn = new Button("Sign in");
+        signUpBtn = new Button("Sign up");
 
         regLbl = new JLabel("Savetovaliste \"Novi Pocetak\"");
         regLbl.setFont(new Font("Arial", Font.BOLD, 20));

@@ -1,10 +1,15 @@
 package savetovaliste;
 
+import savetovaliste.controller.observer.IPublisher;
+import savetovaliste.controller.observer.ISubscriber;
 import savetovaliste.gui.view.MainFrame;
 import savetovaliste.model.Psihoterapeut;
 
-public class Session {
+import java.util.ArrayList;
+
+public class Session implements IPublisher {
     private static Session instance;
+    private final ArrayList<ISubscriber> subscribers = new ArrayList<>();
     private int id = -1;
     private Psihoterapeut psihoterapeut;
 
@@ -28,7 +33,7 @@ public class Session {
 
     private void setUserId(int id) {
         this.id = id;
-        MainFrame.getInstance().onRefreshSession();
+        publish(id);
     }
 
     public int getUserId() {
@@ -37,5 +42,22 @@ public class Session {
 
     public Psihoterapeut getPsihoterapeut() {
         return psihoterapeut;
+    }
+
+    @Override
+    public void addSubscriber(ISubscriber subscriber) {
+        subscribers.add(subscriber);
+    }
+
+    @Override
+    public void removeSubscriber(ISubscriber subscriber) {
+        subscribers.remove(subscriber);
+    }
+
+    @Override
+    public void publish(Object value) {
+        for (ISubscriber subscriber : new ArrayList<>(subscribers)) {
+            subscriber.update(value);
+        }
     }
 }

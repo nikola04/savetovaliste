@@ -1,15 +1,14 @@
 package savetovaliste.gui.view;
 
 import savetovaliste.Session;
+import savetovaliste.controller.observer.ISubscriber;
 import savetovaliste.gui.view.psihoterapeut.MainScreenPsih;
 
 import javax.swing.*;
 import java.awt.*;
 
-public class MainFrame extends JFrame {
+public class MainFrame extends JFrame implements ISubscriber {
     private static MainFrame instance;
-    private static MainScreenPsih mainScreenPsih;
-    private static MainScreen mainScreenLogin;
     public static MainFrame getInstance() {
         if (instance == null) {
             instance = new MainFrame();
@@ -20,16 +19,19 @@ public class MainFrame extends JFrame {
     }
     private MainFrame(){}
 
-    public void onRefreshSession(){
-        if(Session.getInstance().getUserId() == -1) {
-            this.setContentPane(MainScreen.getInstance());
-        }else this.setContentPane(MainScreenPsih.getInstance());
+    public void update(Object value) {
+        if(value instanceof Integer userId) {
+            if (userId == -1) {
+                this.setContentPane(MainScreen.getInstance());
+            } else this.setContentPane(MainScreenPsih.getInstance());
 
-        this.revalidate();
-        this.repaint();
+            this.revalidate();
+            this.repaint();
+        }
     }
 
     public void initialize() {
+        Session.getInstance().addSubscriber(this);
     }
 
     public void initializeGUI() {

@@ -1,7 +1,9 @@
 package savetovaliste.data.utility;
 
 import savetovaliste.data.DBUtil;
+import savetovaliste.model.Oblast;
 import savetovaliste.model.Psihoterapeut;
+import savetovaliste.model.Sertifikat;
 import savetovaliste.model.Struka;
 
 import java.sql.*;
@@ -50,20 +52,48 @@ public class JDBCUtils {
         return struke;
     }
 
-
-    public static void RegisterPsihoterapeut(String ime, String prezime, String jmbg, String email, String telefon, Date mysqlDate, int brojSertifikata, int strukaId) throws SQLException{
-        String sql = "{CALL dodaj_psihoterapeuta(?, ?, ?, ?, ?, ?, ?, ?)}";
+    public static Sertifikat GetSertifikat(int sertifikatId) throws SQLException {
+        String sql = "SELECT datum_sertifikata, sertifikat.oblasti_id as oblast_id, naziv as oblast_naziv FROM sertifikat INNER JOIN oblast ON oblast.oblasti_id = sertifikat.oblasti_id WHERE sertifikat_id = ?";
         PreparedStatement stmt = DBUtil.getConnection().prepareStatement(sql);
-        stmt.setString(1, ime);
-        stmt.setString(2, prezime);
-        stmt.setString(3, jmbg);
-        stmt.setString(4, email);
-        stmt.setString(5, telefon);
-        stmt.setDate(6, mysqlDate);
-        stmt.setInt(7, brojSertifikata);
-        stmt.setInt(8, strukaId);
-        stmt.executeUpdate();
-        stmt.close();
+        stmt.setInt(1, sertifikatId);
+        ResultSet rs = stmt.executeQuery();
 
+        Sertifikat sertifikat = null;
+        if(rs.next()) {
+            Date datum = rs.getDate("datum_sertifikata");
+            int oblastId = rs.getInt("oblast_id");
+            String oblastNaziv = rs.getString("oblast_naziv");
+            sertifikat = new Sertifikat(sertifikatId, datum, new Oblast(oblastId, oblastNaziv));
+        }
+        rs.close();
+        stmt.close();
+        return sertifikat;
+    }
+
+    public static int RegisterPsihoterapeut(String ime, String prezime, String jmbg, String email, String telefon, Date mysqlDate, int brojSertifikata, int strukaId) throws SQLException{
+        try {
+            String sql = "{CALL dodaj_psihoterapeuta(?, ?, ?, ?, ?, ?, ?, ?)}";
+            CallableStatement stmt = DBUtil.getConnection().prepareCall(sql);
+            stmt.setString(1, ime);
+            stmt.setString(2, prezime);
+            stmt.setString(3, jmbg);
+            stmt.setString(4, email);
+            stmt.setString(5, telefon);
+            stmt.setDate(6, mysqlDate);
+            stmt.setInt(7, brojSertifikata);
+            stmt.setInt(8, strukaId);
+
+            stmt.execute();
+            stmt.close();
+            return 0;
+        }catch (SQLIntegrityConstraintViolationException e) {
+            if (e.getMessage().contains("unique_jmbg"))
+                return -1;
+            if (e.getMessage().contains("unique_email"))
+                return -2;
+            if (e.getMessage().contains("unique_sertifikat_id"))
+                return -3;
+            return -4;
+        }
     }
 }
