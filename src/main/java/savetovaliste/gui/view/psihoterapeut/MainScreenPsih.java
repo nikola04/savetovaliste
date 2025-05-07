@@ -48,6 +48,10 @@ public class MainScreenPsih extends JPanel implements ISubscriber {
     public void update(Object value){
         if((value instanceof Integer userId) && userId == -1){
             profileFrame.setVisible(false);
+            clientApplicationsFrame.setVisible(false);
+            pastSessionsFrame.setVisible(false);
+            upcomingSessionsFrame.setVisible(false);
+            paymentsFrame.setVisible(false);
         }
         updateData();
     }
