@@ -160,6 +160,7 @@ public class SignUpForm extends JFrame {
                 }
                 if(success == -2) {
                     JOptionPane.showMessageDialog(null, "Email adresa je vec registrovan.", "Psihoterapeut je vec registrovan", JOptionPane.ERROR_MESSAGE);
+                    return;
                 }
                 if(success == -3) {
                     JOptionPane.showMessageDialog(null, "Broj sertifikata je vec registrovan.", "Broj sertifikata je vec registrovan", JOptionPane.ERROR_MESSAGE);

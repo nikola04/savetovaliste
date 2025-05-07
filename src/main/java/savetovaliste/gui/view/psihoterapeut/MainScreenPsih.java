@@ -12,13 +12,20 @@ import java.awt.event.ActionListener;
 public class MainScreenPsih extends JPanel implements ISubscriber {
     private static MainScreenPsih instance;
     private Psihoterapeut psihoterapeut;
+
+    private JFrame profileFrame;
+    private JFrame clientApplicationsFrame;
+    private JFrame pastSessionsFrame;
+    private JFrame upcomingSessionsFrame;
+    private JFrame paymentsFrame;
+
     private Button btnLogout;
     private Button btnShowProfile;
     private Button btnClientApplications;
     private Button btnPastSessions;
     private Button btnUpcomingSessions;
-    private JLabel msg;
-    private JFrame profileFrame;
+    private Button btnPayments;
+    private JLabel lblGreeting;
 
     public static MainScreenPsih getInstance() {
         if (instance == null) {
@@ -35,7 +42,7 @@ public class MainScreenPsih extends JPanel implements ISubscriber {
     private void updateData(){
         psihoterapeut = Session.getInstance().getPsihoterapeut();
         if(psihoterapeut == null) return;
-        msg.setText("Pozdrav " + psihoterapeut.getIme() + "!");
+        lblGreeting.setText("Dobrodosli " + psihoterapeut.getIme() + "!");
     }
 
     public void update(Object value){
@@ -52,27 +59,37 @@ public class MainScreenPsih extends JPanel implements ISubscriber {
         profileFrame.setContentPane(ProfileScreen.getInstance());
         profileFrame.setSize(500, 320);
 
+        clientApplicationsFrame = new JFrame("Prijave klijenta");
+        clientApplicationsFrame.setContentPane(ClientApplicScreen.getInstance());
+        clientApplicationsFrame.setSize(500, 320);
+
+        pastSessionsFrame = new JFrame("Odrzane Seanse");
+        pastSessionsFrame.setContentPane(PastSessionsScreen.getInstance());
+        pastSessionsFrame.setSize(500, 320);
+
+        upcomingSessionsFrame = new JFrame("Buduci termini");
+        upcomingSessionsFrame.setContentPane(UpcSessionsScreen.getInstance());
+        upcomingSessionsFrame.setSize(500, 320);
+
+        paymentsFrame = new JFrame("Uplate i dugovanja");
+        paymentsFrame.setContentPane(PaymentsScreen.getInstance());
+        paymentsFrame.setSize(500, 320);
+
         btnLogout = new Button("Odjavi se");
         btnShowProfile = new Button("Moj Profil");
         btnClientApplications = new Button("Prijave klijenta");
         btnPastSessions = new Button("Odrzane Seanse");
         btnUpcomingSessions = new Button("Buduci termini");
+        btnPayments = new Button("Uplate i dugovanja");
 
-        msg = new JLabel("Pozdrav!");
-    }
-
-    private void initControllers(){
-        btnLogout.addActionListener(e -> Session.getInstance().logoutUser());
-        btnShowProfile.addActionListener(e -> {
-            profileFrame.setVisible(true);
-        });
+        lblGreeting = new JLabel("Pozdrav!");
     }
 
     private void initializeGUI() {
         setLayout(new BorderLayout());
 
         JPanel headingPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 0, 10));
-        headingPanel.add(msg);
+        headingPanel.add(lblGreeting);
         add(headingPanel, BorderLayout.NORTH);
 
         JPanel mainPanel = new JPanel();
@@ -82,6 +99,7 @@ public class MainScreenPsih extends JPanel implements ISubscriber {
         addButton(mainPanel, btnClientApplications);
         addButton(mainPanel, btnPastSessions);
         addButton(mainPanel, btnUpcomingSessions);
+        addButton(mainPanel, btnPayments);
         addButton(mainPanel, btnLogout);
 
         add(mainPanel, BorderLayout.CENTER);
@@ -92,4 +110,15 @@ public class MainScreenPsih extends JPanel implements ISubscriber {
         panel.add(button);
     }
 
+    private void initControllers(){
+        btnLogout.addActionListener(_ -> {
+            if(JOptionPane.showConfirmDialog(null, "Jeste li sigurni da zelite da se odjavite", "Potvrdite odjavu", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION)
+                Session.getInstance().logoutUser();
+        });
+        btnShowProfile.addActionListener(_ -> profileFrame.setVisible(true));
+        btnClientApplications.addActionListener(_ -> clientApplicationsFrame.setVisible(true));
+        btnPastSessions.addActionListener(_ -> pastSessionsFrame.setVisible(true));
+        btnUpcomingSessions.addActionListener(_ -> upcomingSessionsFrame.setVisible(true));
+        btnPayments.addActionListener(_ -> paymentsFrame.setVisible(true));
+    }
 }

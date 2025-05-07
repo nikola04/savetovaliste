@@ -45,7 +45,6 @@ public class LogInFrom extends JFrame {
         txt2 = new JTextField();
         btn1 = new JButton("Login");
 
-        // Pravimo pomoćnu metodu da postavimo maksimalnu veličinu
         setItemHeight(lbl1, itemSize);
         setItemHeight(lbl2, itemSize);
         setItemHeight(txt1, itemSize);
@@ -81,10 +80,7 @@ public class LogInFrom extends JFrame {
                         return;
                     }
                     Session.getInstance().loginUser(psihoterapeut);
-//                    JOptionPane.showMessageDialog(null, "Uspesna Prijava.", "Uspesno", JOptionPane.INFORMATION_MESSAGE);
-
                     dispose();
-
                 } catch (SQLException ex) {
                     ex.printStackTrace();
                 }
