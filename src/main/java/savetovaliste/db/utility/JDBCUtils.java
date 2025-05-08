@@ -1,5 +1,6 @@
 package savetovaliste.db.utility;
 
+import savetovaliste.Session;
 import savetovaliste.db.DBUtil;
 import savetovaliste.model.*;
 
@@ -107,7 +108,54 @@ public class JDBCUtils {
 
         return seanse;
     }
+    public static Klijent getKlijent(int klijentId) throws SQLException {
+        String sql = "SELECT * FROM klijent WHERE klijent_id = ?";
+        PreparedStatement stmt = DBUtil.getConnection().prepareStatement(sql);
+        stmt.setInt(1, klijentId);
+        ResultSet rs = stmt.executeQuery();
+        Klijent klijent;
+        if(rs.next()){
+            int id = rs.getInt("klijent_id");
+            String ime = rs.getString("ime");
+            String prezime = rs.getString("prezime");
+            String email = rs.getString("email");
+            String telefon = rs.getString("broj");
+            Date datumRodjenja = rs.getDate("datum_rodjenja");
+            String pol = rs.getString("pol");
+            boolean ranijeTerapije = rs.getBoolean("ranije_terapije");
+            klijent = new Klijent(id,ime,prezime,email,telefon,pol,datumRodjenja, ranijeTerapije);
+        }else{
+            System.out.println("nema Klijenta sa tim id");
+            return null;
+        }
 
+        return klijent;
+    }
+    public static ArrayList<Klijent> getKlijents() throws SQLException {
+        String sql = "SELECT k.* " +
+                "FROM klijent k " +
+                "JOIN prijava p ON k.prijava_id = p.prijava_id " +
+                "WHERE p.psihoterapeut_id = ?";
+
+        PreparedStatement stmt = DBUtil.getConnection().prepareStatement(sql);
+        stmt.setInt(1, Session.getInstance().getPsihoterapeut().getId());
+        ResultSet rs = stmt.executeQuery();
+        ArrayList<Klijent> klijenti = new ArrayList<>();
+        while (rs.next()) {
+            int klijentId = rs.getInt("klijent_id");
+            String ime = rs.getString("ime");
+            String prezime = rs.getString("prezime");
+            String email = rs.getString("email");
+            String telefon = rs.getString("broj");
+            Date datumRodjenja = rs.getDate("datum_rodjenja");
+            String pol = rs.getString("pol");
+            boolean ranijeTerapije = rs.getBoolean("ranije_terapije");
+            Klijent k = new Klijent(klijentId,ime,prezime,email,telefon,pol,datumRodjenja, ranijeTerapije);
+            klijenti.add(k);
+        }
+
+        return klijenti;
+    }
     public static ArrayList<Seansa> getBuduceSeanse(Psihoterapeut psihoterapeut) throws SQLException {
         String sql = "SELECT s.*, k.*, p.*, cena_seanse.cena, cena_seanse.datum_promene as datum_promene_cene " +
                 "FROM seansa as s INNER JOIN cena_seanse ON cena_seanse.cena_seanse_id = s.cena_seanse_id " +

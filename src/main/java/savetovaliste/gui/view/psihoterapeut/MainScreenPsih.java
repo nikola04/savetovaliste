@@ -77,7 +77,7 @@ public class MainScreenPsih extends JPanel implements ISubscriber {
 
         paymentsFrame = new JFrame("Uplate i dugovanja");
         paymentsFrame.setContentPane(PaymentsScreen.getInstance());
-        paymentsFrame.setSize(500, 320);
+        paymentsFrame.setSize(800, 400);
 
         btnLogout = new Button("Odjavi se");
         btnShowProfile = new Button("Moj Profil");

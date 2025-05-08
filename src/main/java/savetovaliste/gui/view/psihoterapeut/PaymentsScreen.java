@@ -1,10 +1,19 @@
 package savetovaliste.gui.view.psihoterapeut;
 
 import savetovaliste.Session;
+import savetovaliste.controller.btnactions.BtnEditor;
+import savetovaliste.controller.btnactions.BtnRenderer;
 import savetovaliste.controller.observer.ISubscriber;
+import savetovaliste.db.utility.JDBCUtils;
+import savetovaliste.model.Klijent;
+import savetovaliste.model.Prijava;
 
 import javax.swing.*;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableColumn;
+import java.sql.SQLException;
+import java.util.ArrayList;
 
 public class PaymentsScreen  extends JPanel implements ISubscriber {
     private static PaymentsScreen instance;
@@ -12,11 +21,6 @@ public class PaymentsScreen  extends JPanel implements ISubscriber {
     private JTable klijentiTable;
     private JScrollPane scrollPane;
     private DefaultTableModel modelKlijenti;
-    private JButton btnUplate;
-    private JButton btnDugovanja;
-    private JTable uplatedugovanjaTable;
-    private DefaultTableModel modelUplateDugovanja;
-    private JScrollPane scrollPaneUplateDugovanja;
 
 
     public static PaymentsScreen getInstance(){
@@ -32,21 +36,18 @@ public class PaymentsScreen  extends JPanel implements ISubscriber {
         lblHeading = new JLabel("Uplate i Dugovanja Klijenata");
         klijentiTable = new JTable();
         scrollPane = new JScrollPane(klijentiTable);
-        uplatedugovanjaTable = new JTable();
         modelKlijenti = new DefaultTableModel();
-        modelUplateDugovanja = new DefaultTableModel();
-        scrollPaneUplateDugovanja = new JScrollPane(uplatedugovanjaTable);
-        btnUplate = new JButton("Uplate Klijenta");
-        btnDugovanja = new JButton("Dugovanja Klijenta");
+
         modelKlijenti.addColumn("ID Klijenta");
         modelKlijenti.addColumn("Ime");
         modelKlijenti.addColumn("Prezime");
-        modelKlijenti.addColumn("Jmbg");
         modelKlijenti.addColumn("Email");
         modelKlijenti.addColumn("Telefon");
         modelKlijenti.addColumn("Datum rodjenja");
         modelKlijenti.addColumn("Ranije terapije");
-        modelUplateDugovanja.addColumn("Datum");
+        modelKlijenti.addColumn("Uplate");
+        modelKlijenti.addColumn("Dugovanja");
+
 
         this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
         this.setAlignmentX(CENTER_ALIGNMENT);
@@ -54,18 +55,31 @@ public class PaymentsScreen  extends JPanel implements ISubscriber {
         this.add(Box.createVerticalStrut(10));
         this.add(scrollPane);
         this.add(Box.createVerticalStrut(10));
-        this.add(btnUplate);
-        this.add(Box.createVerticalStrut(10));
-        this.add(btnDugovanja);
-        this.add(Box.createVerticalStrut(10));
-        this.add(new JSeparator(SwingConstants.HORIZONTAL));
-        this.add(scrollPaneUplateDugovanja);
 
         setTables();
+        klijentiTable.getColumn("Uplate").setCellRenderer(new BtnRenderer());
+        klijentiTable.getColumn("Dugovanja").setCellRenderer(new BtnRenderer());
+        klijentiTable.getColumn("Uplate").setCellEditor(new BtnEditor(klijentiTable,"Uplata"));
+        klijentiTable.getColumn("Dugovanja").setCellEditor(new BtnEditor(klijentiTable,"Dugovanja"));
+
 
     }
 
     private void setTables() {
+        ArrayList<Klijent> klijenti = new ArrayList<>();
+        try {
+            klijenti.addAll(JDBCUtils.getKlijents());
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        for(Klijent klijent : klijenti) {
+            String s = "NE";
+            if(klijent.isRanijeTerapije())
+                s = "DA";
+
+            modelKlijenti.addRow(new Object[]{klijent.getId(),klijent.getIme(), klijent.getPrezime(), klijent.getEmail(),klijent.getTelefon() ,klijent.getDatumRodjenja(), s,"Uplata","Dug"});
+        }
+        klijentiTable.setModel(modelKlijenti);
     }
 
     @Override
