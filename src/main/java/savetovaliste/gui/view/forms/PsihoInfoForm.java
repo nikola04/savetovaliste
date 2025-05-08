@@ -33,7 +33,7 @@ public class PsihoInfoForm {
         try {
             psihoterapeuts.addAll(JDBCUtils.getPsihoterapeuts());
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            e.printStackTrace();
         }
         DefaultTableModel model = new DefaultTableModel();
         model.addColumn("ID");

@@ -40,7 +40,7 @@ public class ClientApplicScreen extends JPanel implements ISubscriber {
     private void initializeGUI() {
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
-        model.addColumn("Prijava ID");
+        model.addColumn("ID");
         model.addColumn("Klijent ID");
         model.addColumn("Ime");
         model.addColumn("Prezime");
@@ -67,7 +67,7 @@ public class ClientApplicScreen extends JPanel implements ISubscriber {
         if((psihoterapeut = Session.getInstance().getPsihoterapeut()) == null)
             return;
         try {
-            for (Prijava prijava : JDBCUtils.PsihoterapeutPrijave(psihoterapeut)) {
+            for (Prijava prijava : JDBCUtils.getPsihoterapeutPrijave(psihoterapeut)) {
                 Klijent klijent = prijava.getKlijent();
                 model.addRow(new Object[]{prijava.getId() + "", klijent.getId() + "", klijent.getIme(), klijent.getPrezime(), klijent.getEmail(), klijent.getTelefon(), klijent.getPol(), klijent.getDatumRodjenja().toString(), klijent.isRanijeTerapije() ? "DA" : "NE"});
             }

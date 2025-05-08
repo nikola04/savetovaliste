@@ -74,7 +74,7 @@ public class LogInFrom extends JFrame {
                     return;
                 }
                 try {
-                    Psihoterapeut psihoterapeut = JDBCUtils.LoginPsihoterapeut(email, jmbg);
+                    Psihoterapeut psihoterapeut = JDBCUtils.loginPsihoterapeut(email, jmbg);
                     if(psihoterapeut == null) {
                         JOptionPane.showMessageDialog(null, "Korisnik nije pronađen.", "Greska", JOptionPane.ERROR_MESSAGE);
                         return;

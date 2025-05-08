@@ -95,7 +95,7 @@ public class SignUpForm extends JFrame {
         JDatePanelImpl datePanel = new JDatePanelImpl(model, pr);
         datePicker = new JDatePickerImpl(datePanel, new DateComponentFormatter());
 
-        ArrayList<Struka> struke = JDBCUtils.SveStruke();
+        ArrayList<Struka> struke = JDBCUtils.getStruke();
         cbStruka = new JComboBox(struke.toArray());
 
         int row = 0;
@@ -146,7 +146,7 @@ public class SignUpForm extends JFrame {
             System.out.println(mysqlDate);
 
             try {
-                int success = JDBCUtils.RegisterPsihoterapeut(ime,prezime,jmbg,email,telefon,mysqlDate,brojSertifikata,strukaId);
+                int success = JDBCUtils.registerPsihoterapeut(ime,prezime,jmbg,email,telefon,mysqlDate,brojSertifikata,strukaId);
                 if(success == 0) {
                     JOptionPane.showMessageDialog(null, "Uspesna registracija.", "Uspesno", JOptionPane.INFORMATION_MESSAGE);
                     dispose();

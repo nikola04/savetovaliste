@@ -36,7 +36,7 @@ public class Psihoterapeut {
 
     public boolean fetchSertifikat(){
         try{
-            this.sertifikat = JDBCUtils.GetSertifikat(this.sertifikatId);
+            this.sertifikat = JDBCUtils.getSertifikat(this.sertifikatId);
             return true;
         } catch (SQLException e) {
             e.printStackTrace();

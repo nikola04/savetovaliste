@@ -69,7 +69,7 @@ public class MainScreenPsih extends JPanel implements ISubscriber {
 
         pastSessionsFrame = new JFrame("Odrzane Seanse");
         pastSessionsFrame.setContentPane(PastSessionsScreen.getInstance());
-        pastSessionsFrame.setSize(500, 320);
+        pastSessionsFrame.setSize(900, 320);
 
         upcomingSessionsFrame = new JFrame("Buduci termini");
         upcomingSessionsFrame.setContentPane(UpcSessionsScreen.getInstance());
