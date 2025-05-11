@@ -453,15 +453,21 @@ public class JDBCUtils {
         }
     }
 
-    public static ArrayList<Beleske> getBeleske(int seansaId) throws SQLException {
+    public static ArrayList<Beleske> getBeleske(Seansa seansa) throws SQLException {
         String sql = "SELECT * FROM beleske WHERE seansa_id = ?";
         PreparedStatement stmt = DBUtil.getConnection().prepareStatement(sql);
-        stmt.setInt(1, seansaId);
+        stmt.setInt(1, seansa.getId());
         ResultSet rs = stmt.executeQuery();
         ArrayList<Beleske> beleskeList= new ArrayList<Beleske>();
         while (rs.next()) {
-
+          int beleskeId = rs.getInt("beleske_id");
+          String tekstBeleske = rs.getString("tekst");
+          Beleske b = new Beleske(beleskeId,tekstBeleske,seansa);
+          beleskeList.add(b);
         }
+        rs.close();
+        stmt.close();
+
         return beleskeList;
     }
 }

@@ -201,8 +201,8 @@ public class SeansaInfoScreen extends JFrame {
         contentPane.add(cena, gbc);
         btnBeleske.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                BeleskeScreen.getInstance(seansaId);
-                BeleskeScreen.getInstance(seansaId).setVisible(true);
+                BeleskeScreen.getInstance(seansa);
+                BeleskeScreen.getInstance(seansa).setVisible(true);
 
             }
         });
