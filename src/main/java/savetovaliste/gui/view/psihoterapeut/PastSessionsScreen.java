@@ -25,10 +25,8 @@ public class PastSessionsScreen extends JPanel implements ISubscriber {
             instance = new PastSessionsScreen();
             instance.initialize();
             instance.initializeGUI();
-
-            instance.fetchData();
-
         }
+        instance.fetchData();
         return instance;
     }
 

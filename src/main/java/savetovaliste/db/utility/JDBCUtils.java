@@ -273,15 +273,14 @@ public class JDBCUtils {
     }
     public static ArrayList<Seansa> getBuduceSeanse(Psihoterapeut psihoterapeut) throws SQLException {
         String sql = "SELECT s.*, k.*, p.*, cena_seanse.cena, cena_seanse.datum_promene as datum_promene_cene " +
-                "FROM seansa as s INNER JOIN cena_seanse ON cena_seanse.cena_seanse_id = s.cena_seanse_id " +
-                "INNER JOIN klijent as k ON k.klijent_id = s.klijent_id " +
-                "INNER JOIN prijava as p ON p.prijava_id = k.prijava_id " +
-                "WHERE p.psihoterapeut_id = ? AND s.dan > CURRENT_DATE OR (s.dan = CURRENT_DATE AND ADDTIME(s.vreme, SEC_TO_TIME(s.vreme_trajanja * 60)) > CURRENT_TIME) " +
-                "ORDER BY s.dan, s.vreme";
-
+                "                FROM seansa as s INNER JOIN cena_seanse ON cena_seanse.cena_seanse_id = s.cena_seanse_id " +
+                "                INNER JOIN klijent as k ON k.klijent_id = s.klijent_id " +
+                "                INNER JOIN prijava as p ON p.prijava_id = k.prijava_id " +
+                "                WHERE p.psihoterapeut_id = ? AND s.dan > CURRENT_DATE OR (s.dan = CURRENT_DATE AND ADDTIME(s.vreme, SEC_TO_TIME(s.vreme_trajanja * 60)) > CURRENT_TIME) " +
+                "                ORDER BY s.dan, s.vreme;";
         PreparedStatement stmt = DBUtil.getConnection().prepareStatement(sql);
         stmt.setInt(1, psihoterapeut.getId());
-        ResultSet rs = stmt.executeQuery(sql);
+        ResultSet rs = stmt.executeQuery();
 
         ArrayList<Seansa> seanse = new ArrayList<>();
 
@@ -304,21 +303,21 @@ public class JDBCUtils {
             klijent.setPrijava(prijava);
 
             double cena = rs.getDouble("cena");
-            Date datumPromeneCene = rs.getDate("datum_promene");
+            Date datumPromeneCene = rs.getDate("datum_promene_cene");
 
             CenaSeanse cenaSeanse = new CenaSeanse(cenaId, cena, datumPromeneCene);
 
             boolean prva = rs.getBoolean("prva");
-            Date datum = rs.getDate("datum");
+            Date datum = rs.getDate("dan");
             Time vreme = rs.getTime("vreme");
             int trajanje = rs.getInt("vreme_trajanja");
             boolean naRate = rs.getBoolean("na_rate");
             boolean placeno = rs.getBoolean("placeno");
 
-
             Seansa seansa = new Seansa(seansaId, klijent, datum, vreme, trajanje, prva, naRate, placeno, cenaSeanse);
             seanse.add(seansa);
         }
+
         rs.close();
         stmt.close();
         return seanse;
@@ -475,5 +474,32 @@ public class JDBCUtils {
         rs.close();
         stmt.close();
         return beleskeList;
+    }
+
+    public static ArrayList<Testiranje> getTestiranje(Seansa seansa) throws SQLException {
+        String sql = "SELECT t.testiranje_id, t.rezultat, t.test_id, te.naziv, te.cena, te.oblast_testa_id as oblast_id, ot.naziv as oblast \n" +
+                "FROM testiranje as t\n" +
+                "INNER JOIN test as te ON te.test_id = t.test_id\n" +
+                "INNER JOIN oblast_test as ot ON ot.oblast_testa_id = te.oblast_testa_id\n" +
+                "WHERE t.seansa_id = ?;";
+        PreparedStatement stmt = DBUtil.getConnection().prepareStatement(sql);
+        stmt.setInt(1, seansa.getId());
+        ResultSet rs = stmt.executeQuery();
+        ArrayList<Testiranje> testiranja = new ArrayList<>();
+        while (rs.next()) {
+            int id = rs.getInt("testiranje_id");
+            int testId = rs.getInt("test_id");
+            int oblastId = rs.getInt("oblast_id");
+            double rezultat = rs.getDouble("rezultat");
+            String naziv = rs.getString("naziv");
+            int cena = rs.getInt("cena");
+            String oblast = rs.getString("oblast");
+            OblastTesta oblastTesta = new OblastTesta(oblastId, oblast);
+            Test test = new Test(testId, naziv, cena, oblastTesta);
+            testiranja.add(new Testiranje(id, test, rezultat, seansa));
+        }
+        rs.close();
+        stmt.close();
+        return testiranja;
     }
 }
