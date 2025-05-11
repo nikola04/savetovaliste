@@ -1,6 +1,8 @@
 package savetovaliste.gui.view.psihoterapeut;
 
 import savetovaliste.Session;
+import savetovaliste.controller.btnactions.BtnEditor;
+import savetovaliste.controller.btnactions.BtnRenderer;
 import savetovaliste.controller.observer.ISubscriber;
 import savetovaliste.db.utility.JDBCUtils;
 import savetovaliste.model.Klijent;
@@ -23,7 +25,9 @@ public class PastSessionsScreen extends JPanel implements ISubscriber {
             instance = new PastSessionsScreen();
             instance.initialize();
             instance.initializeGUI();
+
             instance.fetchData();
+
         }
         return instance;
     }
@@ -50,8 +54,10 @@ public class PastSessionsScreen extends JPanel implements ISubscriber {
         model.addColumn("Pol");
         model.addColumn("Datum Rodjenja");
         model.addColumn("Ranije terapije");
+        model.addColumn("Vise o Seansi");
 
         table = new JTable(model);
+
 
         JScrollPane scrollPane = new JScrollPane(table);
         add(Box.createVerticalStrut(10));
@@ -68,13 +74,15 @@ public class PastSessionsScreen extends JPanel implements ISubscriber {
             for (Seansa seansa : JDBCUtils.getOdrzaneSeanse(psihoterapeut)) {
                 Klijent klijent = seansa.getKlijent();
                 model.addRow(new Object[]{
-                        seansa.getId() + "", seansa.getDatum().toString(), seansa.getVreme().toString(), seansa.getTrajanje() + "min", seansa.isPlaceno() ? "DA" : "NE",
+                        seansa.getId() , seansa.getDatum().toString(), seansa.getVreme().toString(), seansa.getTrajanje() + "min", seansa.isPlaceno() ? "DA" : "NE",
                         klijent.getId() + "", klijent.getIme(), klijent.getPrezime(), klijent.getEmail(), klijent.getTelefon(), klijent.getPol(), klijent.getDatumRodjenja().toString(), klijent.isRanijeTerapije() ? "DA" : "NE"});
             }
             table.setModel(model);
         } catch (SQLException e) {
             e.printStackTrace();
         }
+        table.getColumn("Vise o Seansi").setCellRenderer(new BtnRenderer());
+        table.getColumn("Vise o Seansi").setCellEditor(new BtnEditor(table,"Vise o Seansi"));
     }
 
     @Override

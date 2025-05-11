@@ -4,9 +4,9 @@ import java.util.Date;
 
 public class CenaSeanse {
     private final int id;
-    private final int cena;
+    private final Double cena;
     private final Date datumPromene;
-    public CenaSeanse(int id, int cena, Date datumPromene) {
+    public CenaSeanse(int id, double cena, Date datumPromene) {
         this.id = id;
         this.cena = cena;
         this.datumPromene = datumPromene;
@@ -15,7 +15,7 @@ public class CenaSeanse {
     public int getId() {
         return id;
     }
-    public int getCena() {
+    public double getCena() {
         return cena;
     }
     public Date getDatumPromene() {

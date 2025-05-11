@@ -89,7 +89,7 @@ public class JDBCUtils {
             Prijava prijava = new Prijava(prijavaId, klijent, psihoterapeut);
             klijent.setPrijava(prijava);
 
-            int cena = rs.getInt("cena");
+            double cena = rs.getDouble("cena");
             Date datumPromeneCene = rs.getDate("datum_promene_cene");
 
             CenaSeanse cenaSeanse = new CenaSeanse(cenaId, cena, datumPromeneCene);
@@ -292,7 +292,7 @@ public class JDBCUtils {
             Prijava prijava = new Prijava(prijavaId, klijent, psihoterapeut);
             klijent.setPrijava(prijava);
 
-            int cena = rs.getInt("cena");
+            double cena = rs.getDouble("cena");
             Date datumPromeneCene = rs.getDate("datum_promene");
 
             CenaSeanse cenaSeanse = new CenaSeanse(cenaId, cena, datumPromeneCene);
@@ -311,6 +311,49 @@ public class JDBCUtils {
 
         return seanse;
     }
+    public static Seansa getSeansa(int seansaId) throws SQLException {
+        String sql = "SELECT *\n" +
+                "FROM seansa s\n" +
+                "INNER JOIN klijent k ON s.klijent_id = k.klijent_id\n" +
+                "INNER JOIN cena_seanse c ON s.cena_seanse_id = c.cena_seanse_id\n" +
+                "WHERE s.seansa_id =?;\n";
+        PreparedStatement stmt = DBUtil.getConnection().prepareStatement(sql);
+        stmt.setInt(1, seansaId);
+        ResultSet rs = stmt.executeQuery();
+        Seansa seansa = null;
+        if(rs.next()) {
+            int id = rs.getInt("seansa_id");
+
+            int klijentId = rs.getInt("klijent_id");
+            String ime = rs.getString("ime");
+            String prezime = rs.getString("prezime");
+            String email = rs.getString("email");
+            String telefon = rs.getString("broj");
+            Date datumRodjenja = rs.getDate("datum_rodjenja");
+            String pol = rs.getString("pol");
+            boolean ranijeTerapije = rs.getBoolean("ranije_terapije");
+
+
+            boolean prva =rs.getBoolean("prva");
+            Date datumSeanse = rs.getDate("dan");
+            Time vreme = rs.getTime("vreme");
+            int trajanje = rs.getInt("vreme_trajanja");
+            boolean naRate = rs.getBoolean("na_rate");
+            boolean placeno = rs.getBoolean("placeno");
+            int cenaId = rs.getInt("cena_seanse_id");
+            int cena = rs.getInt("cena");
+            Date datumPromene = rs.getDate("datum_promene");
+            int placanjeid = rs.getInt("placanje_id");
+            CenaSeanse cenaSeanse = new CenaSeanse(cenaId,cena,datumPromene);
+            Klijent klijent= new Klijent(klijentId,ime,prezime,email,telefon,pol,datumRodjenja, ranijeTerapije);
+
+            seansa = new Seansa(id,klijent,datumSeanse,vreme,trajanje,prva,naRate,placeno,cenaSeanse);
+
+        }
+        return seansa;
+
+    }
+
 
     public static ArrayList<Struka> getStruke() throws SQLException {
         String sql = "SELECT * FROM struka";

@@ -1,6 +1,7 @@
 package savetovaliste.controller.btnactions;
 
 import savetovaliste.gui.view.psihoterapeut.DugovanjeKlijenta;
+import savetovaliste.gui.view.psihoterapeut.SeansaInfoScreen;
 import savetovaliste.gui.view.psihoterapeut.UplateKlijenta;
 
 import javax.swing.*;
@@ -36,14 +37,17 @@ public Object getCellEditorValue() {
 @Override
 public void actionPerformed(ActionEvent e) {
     int row = table.getSelectedRow();
-    int klijentId = (int) table.getValueAt(row, 0);  // pretpostavljam ID je u prvoj koloni
+    int klijentSeansaId = (int) table.getValueAt(row, 0);
     if (label.equals("Uplate")) {
-        UplateKlijenta.getInstance(klijentId);
-        UplateKlijenta.getInstance(klijentId).setVisible(true);
+        UplateKlijenta.getInstance(klijentSeansaId);
+        UplateKlijenta.getInstance(klijentSeansaId).setVisible(true);
 
     } else if (label.equals("Dugovanja")) {
-        DugovanjeKlijenta.getInstance(klijentId);
-        DugovanjeKlijenta.getInstance(klijentId).setVisible(true);
+        DugovanjeKlijenta.getInstance(klijentSeansaId);
+        DugovanjeKlijenta.getInstance(klijentSeansaId).setVisible(true);
+    }else if(label.equals("Vise o Seansi")){
+        SeansaInfoScreen.getInstance(klijentSeansaId);
+        SeansaInfoScreen.getInstance(klijentSeansaId).setVisible(true);
     }
     fireEditingStopped();
 }
