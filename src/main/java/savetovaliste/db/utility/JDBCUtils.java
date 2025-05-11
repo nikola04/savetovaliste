@@ -499,33 +499,33 @@ public class JDBCUtils {
         return testiranja;
     }
 
-    public static ObjavljivanjePodataka getObjPodatke(int seansaId)throws SQLException {
-        String sql = "SELECT * FROM  objavljivanje_podataka WHERE seansa_id = ?";
+    public static ArrayList<ObjavljeniPodatak> getObjavljeniPodaci(Seansa seansa) throws SQLException {
+        String sql = "SELECT objavljivanje_id, razlog, kome, datum_objave FROM `objavljivanje_podataka` WHERE seansa_id = ?;";
         PreparedStatement stmt = DBUtil.getConnection().prepareStatement(sql);
-        stmt.setInt(1, seansaId);
+        stmt.setInt(1, seansa.getId());
         ResultSet rs = stmt.executeQuery();
-        if (rs.next()) {
-            int objavljivanjeId = rs.getInt("objavljivanje_id");
-            Date datum = rs.getDate("datum_objave");
+
+        ArrayList<ObjavljeniPodatak> objavljivanja = new ArrayList<>();
+        while (rs.next()) {
+            int id = rs.getInt("objavljivanje_id");
             String razlog = rs.getString("razlog");
-            String kome= rs.getString("kome");
-            ObjavljivanjePodataka obj = new ObjavljivanjePodataka(objavljivanjeId,seansaId,datum,razlog,kome);
-            return obj;
+            String kome = rs.getString("kome");
+            Date datum = rs.getDate("datum_objave");
+            objavljivanja.add(new ObjavljeniPodatak(id, seansa, razlog, kome, datum));
         }
         rs.close();
         stmt.close();
-        return null;
+        return objavljivanja;
     }
 
-    public static void setObjPodataka(int seansaId, RazlogObjave razlogObjave, Date date,String kome) throws SQLException {
-        String sql = "{CALL insert_objavljivanje(?, ?, ?,?)}";
+    public static void objaviPodatake(int seansaId, String razlog, String kome,  Date date) throws SQLException {
+        String sql = "{CALL dodaj_objavljivanje(?, ?, ?, ?)}";
         PreparedStatement stmt = DBUtil.getConnection().prepareStatement(sql);
         stmt.setInt(1, seansaId);
-        stmt.setString(2, razlogObjave.toString());
-        stmt.setDate(3, date);
-        stmt.setString(4,kome);
+        stmt.setString(2, kome.toLowerCase().trim());
+        stmt.setString(3, razlog);
+        stmt.setDate(4, date);
         stmt.execute();
         stmt.close();
-        return;
     }
 }

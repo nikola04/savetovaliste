@@ -13,214 +13,165 @@ import java.awt.event.ActionListener;
 import java.sql.SQLException;
 
 public class SeansaInfoScreen extends JFrame {
-    public static SeansaInfoScreen instance;
-    private JPanel contentPane;
+    private static SeansaInfoScreen instance;
     private static int seansaId;
     private Seansa seansa;
-    private JLabel lblSeansa;
-    private JLabel lblSeansaId;
-    private JLabel lblPrva;
-    private JLabel lblDan;
-    private JLabel lblVreme;
-    private JLabel lblVremeTrajanja;
-    private JLabel lblNaRate;
-    private JLabel lblPlaceno;
-    private JLabel cena;
-    private JLabel lblCena;
-    private JLabel lblKlijentID;
-    private JLabel lblKlijentIme;
-    private JLabel lblKlijentPrezime;
-    private JLabel lblKlijentDatum;
-    private JLabel lblKlijentPol;
-    private JLabel lblKlijentEmail;
-    private JLabel lblKlijentTelefon;
-    private JLabel lblklijentRanijeTerapije;
-    private JLabel lblKlijentBrojPrijave;
-    private JButton btnBeleske;
-    private JButton btnObjavljeniPodaci;
+
+    private JFrame frameObjavljeniPodaci;
+
+    private final JLabel lblSeansaId = new JLabel();
+    private final JLabel lblPrva = new JLabel();
+    private final JLabel lblDan = new JLabel();
+    private final JLabel lblVreme = new JLabel();
+    private final JLabel lblVremeTrajanja = new JLabel();
+    private final JLabel lblNaRate = new JLabel();
+    private final JLabel lblPlaceno = new JLabel();
+
+    private final JLabel lblKlijentID = new JLabel();
+    private final JLabel lblKlijentIme = new JLabel();
+    private final JLabel lblKlijentPrezime = new JLabel();
+    private final JLabel lblKlijentDatum = new JLabel();
+    private final JLabel lblKlijentPol = new JLabel();
+    private final JLabel lblKlijentEmail = new JLabel();
+    private final JLabel lblKlijentTelefon = new JLabel();
+    private final JLabel lblklijentRanijeTerapije = new JLabel();
+    private final JLabel lblKlijentBrojPrijave = new JLabel();
+
+    private final JLabel lblCena = new JLabel();
+    private final JLabel lblCenaDatum = new JLabel();
+
+    private final JButton btnBeleske = new JButton("Pogledaj Beleske sa Seanse");
+    private final JButton btnObjavljeniPodaci = new JButton("Objavljeni Podaci");
+
     public static SeansaInfoScreen getInstance(int id){
         if(instance == null){
             instance = new SeansaInfoScreen();
         }
-
         seansaId = id;
-        instance.init();
         instance.fetchData();
         return instance;
     }
 
-    private  void fetchData() {
+    private SeansaInfoScreen() {
+        setTitle("Informacije o Seansi");
+        setSize(700, 370);
+        setLocationRelativeTo(null);
+        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        initializeGUI();
+        registerActions();
+    }
+
+    private void initializeGUI() {
+        setLayout(new BoxLayout(getContentPane(), BoxLayout.Y_AXIS));
+
+        JPanel mainPanel = new JPanel(new GridLayout(1, 2, 20, 0));
+        mainPanel.setBorder(new EmptyBorder(10, 20, 10, 20));
+
+        JPanel leftPanel = new JPanel(new GridBagLayout());
+        GridBagConstraints gbcLeft = new GridBagConstraints();
+        gbcLeft.insets = new Insets(4, 4, 4, 4);
+        gbcLeft.anchor = GridBagConstraints.WEST;
+        gbcLeft.fill = GridBagConstraints.HORIZONTAL;
+
+        int row = 0;
+        row = addRow(leftPanel, gbcLeft, row, "Seansa ID:", lblSeansaId);
+        row = addRow(leftPanel, gbcLeft, row, "Prva Seansa:", lblPrva);
+        row = addRow(leftPanel, gbcLeft, row, "Datum:", lblDan);
+        row = addRow(leftPanel, gbcLeft, row, "Vreme:", lblVreme);
+        row = addRow(leftPanel, gbcLeft, row, "Trajanje:", lblVremeTrajanja);
+        row = addRow(leftPanel, gbcLeft, row, "Na rate:", lblNaRate);
+        row = addRow(leftPanel, gbcLeft, row, "Plaćeno:", lblPlaceno);
+        row = addRow(leftPanel, gbcLeft, row, "Cena Seanse:", lblCena);
+        row = addRow(leftPanel, gbcLeft, row, "Datum promene cene:", lblCenaDatum);
+
+        JPanel rightPanel = new JPanel(new GridBagLayout());
+        GridBagConstraints gbcRight = new GridBagConstraints();
+        gbcRight.insets = new Insets(4, 4, 4, 4);
+        gbcRight.anchor = GridBagConstraints.WEST;
+        gbcRight.fill = GridBagConstraints.HORIZONTAL;
+
+        int rRow = 0;
+        rRow = addRow(rightPanel, gbcRight, rRow, "Klijent ID:", lblKlijentID);
+        rRow = addRow(rightPanel, gbcRight, rRow, "Ime:", lblKlijentIme);
+        rRow = addRow(rightPanel, gbcRight, rRow, "Prezime:", lblKlijentPrezime);
+        rRow = addRow(rightPanel, gbcRight, rRow, "Datum rođenja:", lblKlijentDatum);
+        rRow = addRow(rightPanel, gbcRight, rRow, "Pol:", lblKlijentPol);
+        rRow = addRow(rightPanel, gbcRight, rRow, "Email:", lblKlijentEmail);
+        rRow = addRow(rightPanel, gbcRight, rRow, "Telefon:", lblKlijentTelefon);
+        rRow = addRow(rightPanel, gbcRight, rRow, "Ranije terapije:", lblklijentRanijeTerapije);
+        rRow = addRow(rightPanel, gbcRight, rRow, "Broj prijave:", lblKlijentBrojPrijave);
+
+        mainPanel.add(leftPanel);
+        mainPanel.add(rightPanel);
+        add(mainPanel, BorderLayout.CENTER);
+
+        JPanel btnPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        btnPanel.add(btnBeleske);
+        btnPanel.add(btnObjavljeniPodaci);
+        add(btnPanel, BorderLayout.CENTER);
+
+        frameObjavljeniPodaci = new JFrame("Objavljeni podaci");
+        frameObjavljeniPodaci.setSize(700, 380);
+        frameObjavljeniPodaci.setLayout(new BoxLayout(frameObjavljeniPodaci.getContentPane(), BoxLayout.Y_AXIS));
+    }
+
+
+    private int addRow(JPanel panel, GridBagConstraints gbc, int row, String labelText, JLabel valueLabel) {
+        JLabel label = new JLabel(labelText);
+        label.setFont(new Font("Arial", Font.BOLD, 13));
+        valueLabel.setFont(new Font("Arial", Font.PLAIN, 13));
+
+        gbc.gridx = 0;
+        gbc.gridy = row;
+        gbc.gridwidth = 1;
+        panel.add(label, gbc);
+
+        gbc.gridx = 1;
+        panel.add(valueLabel, gbc);
+
+        return row + 1;
+    }
+
+    private void fetchData() {
         try {
             seansa = JDBCUtils.getSeansa(seansaId);
         } catch (SQLException e) {
             e.printStackTrace();
+            return;
         }
-        lblSeansa.setText("Seansa");
-        lblSeansaId.setText("Seansa ID: " + seansa.getId());
-        lblPrva.setText("Da li je prva seansa: " + (seansa.isPrva()? "Jeste": "Nije prva"));
-        lblDan.setText("Datum Seanse: " + seansa.getDatum());
-        lblVreme.setText("Vreme Seanse: " + seansa.getVreme());
-        lblVremeTrajanja.setText("Vreme Trajanja Seanse: " + seansa.getTrajanje() +"min");
-        lblNaRate.setText("Placanje na rate: " + (seansa.isNaRate()? "DA": "NE"));
-        lblPlaceno.setText("Placeno: "+ (seansa.isPlaceno()? "Jeste": "Nije Placeno"));
+
+        lblSeansaId.setText(String.valueOf(seansa.getId()));
+        lblPrva.setText(seansa.isPrva() ? "Da" : "Ne");
+        lblDan.setText(seansa.getDatum().toString());
+        lblVreme.setText(seansa.getVreme().toString());
+        lblVremeTrajanja.setText(seansa.getTrajanje() + " min");
+        lblNaRate.setText(seansa.isNaRate() ? "Da" : "Ne");
+        lblPlaceno.setText(seansa.isPlaceno() ? "Da" : "Ne");
 
         Klijent k = seansa.getKlijent();
-        lblKlijentID.setText("Klijent ID: "+String.valueOf(k.getId()));
-        lblKlijentIme.setText("Ime: "+k.getIme());
-        lblKlijentPrezime.setText("Prezime: "+k.getPrezime());
-        lblKlijentDatum.setText("Datum rodjenja: " + k.getDatumRodjenja());
-        lblKlijentPol.setText("Pol: "+k.getPol());
-        lblKlijentEmail.setText("Email: "+k.getEmail());
-        lblKlijentTelefon.setText("Telefon: "+k.getTelefon());
-        lblklijentRanijeTerapije.setText("Ranije Terapije: " + (k.isRanijeTerapije()? "Da": "Ne"));
-        String pri;
-        lblKlijentBrojPrijave.setText("Broj Prijave: ");
+        lblKlijentID.setText(String.valueOf(k.getId()));
+        lblKlijentIme.setText(k.getIme());
+        lblKlijentPrezime.setText(k.getPrezime());
+        lblKlijentDatum.setText(k.getDatumRodjenja().toString());
+        lblKlijentPol.setText(k.getPol());
+        lblKlijentEmail.setText(k.getEmail());
+        lblKlijentTelefon.setText(k.getTelefon());
+        lblklijentRanijeTerapije.setText(k.isRanijeTerapije() ? "Da" : "Ne");
+        lblKlijentBrojPrijave.setText("N/A"); // Ako imas podatke, zameni
 
         CenaSeanse cs = seansa.getCenaSeanse();
-        cena.setText("Cena Seanse: " + cs.getCena()+" RSD");
-        lblCena.setText("Datum promene cene: " + cs.getDatumPromene());
+        lblCena.setText(cs.getCena() + " RSD");
+        lblCenaDatum.setText(cs.getDatumPromene().toString());
     }
 
-    private void init() {
-        this.setTitle("Informacije o Seansi");
-        this.setSize(820,660);
-        contentPane = new JPanel();
-        contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
-        setContentPane(contentPane);
-        contentPane.setLayout(new GridBagLayout());
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(5, 5, 5, 5);
-        gbc.anchor = GridBagConstraints.CENTER; // Poravnanje u centru
-        gbc.fill = GridBagConstraints.HORIZONTAL; // Komponenta popunjava celu širinu kolone
-
-
-        lblSeansa = new JLabel("Seansa");
-        lblSeansa.setPreferredSize(new Dimension(200, 50));
-        lblSeansa.setFont(new Font("Arial", Font.BOLD, 15));
-        lblSeansaId = new JLabel("Seansa ID: ");
-        lblSeansaId.setPreferredSize(new Dimension(200, 50));
-        lblSeansaId.setFont(new Font("Arial", Font.BOLD, 15));
-        lblPrva = new JLabel("Prva");
-        lblPrva.setPreferredSize(new Dimension(200, 50));
-        lblPrva.setFont(new Font("Arial", Font.BOLD, 15));
-        lblDan = new JLabel("Dan");
-        lblDan.setPreferredSize(new Dimension(200, 50));
-        lblDan.setFont(new Font("Arial", Font.BOLD, 15));
-        lblVreme = new JLabel("Vreme");
-        lblVreme.setPreferredSize(new Dimension(200, 50));
-        lblVreme.setFont(new Font("Arial", Font.BOLD, 15));
-        lblVremeTrajanja = new JLabel("Vreme Trajanja");
-        lblVremeTrajanja.setPreferredSize(new Dimension(200, 50));
-        lblVremeTrajanja.setFont(new Font("Arial", Font.BOLD, 12));
-        lblNaRate = new JLabel("Na Rate");
-        lblNaRate.setPreferredSize(new Dimension(200, 50));
-        lblNaRate.setFont(new Font("Arial", Font.BOLD, 15));
-        lblPlaceno = new JLabel("Placeno");
-        lblPlaceno.setPreferredSize(new Dimension(200, 50));
-        lblPlaceno.setFont(new Font("Arial", Font.BOLD, 15));
-        cena = new JLabel("Cena");
-        cena.setPreferredSize(new Dimension(200, 50));
-        cena.setFont(new Font("Arial", Font.BOLD, 15));
-        lblCena = new JLabel("Cena");
-        lblCena.setPreferredSize(new Dimension(200, 50));
-        lblCena.setFont(new Font("Arial", Font.BOLD, 12));
-        lblKlijentID = new JLabel("Klijent Id: ");
-        lblKlijentID.setPreferredSize(new Dimension(200, 50));
-        lblKlijentID.setFont(new Font("Arial", Font.BOLD, 15));
-        lblKlijentIme = new JLabel("Ime: ");
-        lblKlijentIme.setPreferredSize(new Dimension(200, 50));
-        lblKlijentIme.setFont(new Font("Arial", Font.BOLD, 15));
-        lblKlijentPrezime = new JLabel("Prezime: ");
-        lblKlijentPrezime.setPreferredSize(new Dimension(200, 50));
-        lblKlijentPrezime.setFont(new Font("Arial", Font.BOLD, 15));
-        lblKlijentDatum = new JLabel("Datum rodjenja: ");
-        lblKlijentDatum.setPreferredSize(new Dimension(200, 50));
-        lblKlijentDatum.setFont(new Font("Arial", Font.BOLD, 15));
-        lblKlijentPol = new JLabel("Pol: ");
-        lblKlijentPol.setPreferredSize(new Dimension(200, 50));
-        lblKlijentPol.setFont(new Font("Arial", Font.BOLD, 15));
-        lblKlijentEmail = new JLabel("Email: ");
-        lblKlijentEmail.setPreferredSize(new Dimension(200, 50));
-        lblKlijentEmail.setFont(new Font("Arial", Font.BOLD, 15));
-        lblKlijentTelefon = new JLabel("Telefon: ");
-        lblKlijentTelefon.setPreferredSize(new Dimension(200, 50));
-        lblKlijentTelefon.setFont(new Font("Arial", Font.BOLD, 15));
-        lblklijentRanijeTerapije = new JLabel("Ranije Terapije: ");
-        lblklijentRanijeTerapije.setPreferredSize(new Dimension(200, 50));
-        lblklijentRanijeTerapije.setFont(new Font("Arial", Font.BOLD, 15));
-        lblKlijentBrojPrijave = new JLabel("Broj Prijave: ");
-        lblKlijentBrojPrijave.setPreferredSize(new Dimension(200, 50));
-        lblKlijentBrojPrijave.setFont(new Font("Arial", Font.BOLD, 15));
-        btnBeleske = new JButton("Pogledaj Beleske sa Seanse");
-        btnBeleske.setFont(new Font("Arial", Font.BOLD, 10));
-        btnBeleske.setPreferredSize(new Dimension(200, 50));
-        btnObjavljeniPodaci = new JButton("Objavljeni Podaci");
-        btnObjavljeniPodaci.setPreferredSize(new Dimension(200, 50));
-        btnObjavljeniPodaci.setFont(new Font("Arial", Font.BOLD, 10));
-
-
-
-        gbc.gridx = 0;
-        gbc.gridy = 0;
-        contentPane.add(lblSeansa, gbc);
-        gbc.gridy = 1;
-        contentPane.add(lblPrva, gbc);
-        gbc.gridy = 2;
-        contentPane.add(lblDan, gbc);
-        gbc.gridy = 3;
-        contentPane.add(lblVreme, gbc);
-        gbc.gridy = 4;
-        contentPane.add(lblVremeTrajanja, gbc);
-        gbc.gridy = 5;
-        contentPane.add(lblNaRate, gbc);
-        gbc.gridy = 6;
-        contentPane.add(lblPlaceno, gbc);
-        gbc.gridy = 7;
-        contentPane.add(btnBeleske, gbc);
-        gbc.gridy = 8;
-        contentPane.add(btnObjavljeniPodaci,gbc);
-
-        gbc.gridx = 1;
-        gbc.gridy = 0;
-        contentPane.add(lblKlijentID, gbc);
-        gbc.gridy = 1;
-        contentPane.add(lblKlijentIme, gbc);
-        gbc.gridy = 2;
-        contentPane.add(lblKlijentPrezime, gbc);
-        gbc.gridy = 3;
-        contentPane.add(lblKlijentDatum, gbc);
-        gbc.gridy = 4;
-        contentPane.add(lblKlijentPol, gbc);
-        gbc.gridy = 5;
-        contentPane.add(lblKlijentEmail, gbc);
-        gbc.gridy = 6;
-        contentPane.add(lblKlijentTelefon, gbc);
-        gbc.gridy = 7;
-        contentPane.add(lblklijentRanijeTerapije, gbc);
-        gbc.gridy = 8;
-        contentPane.add(lblKlijentBrojPrijave, gbc);
-
-        gbc.gridx = 2;
-        gbc.gridy = 0;
-        contentPane.add(lblCena, gbc);
-        gbc.gridy = 1;
-        contentPane.add(cena, gbc);
-        this.pack();
-
-        btnObjavljeniPodaci.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-            ObjPodaciScreen.getInstance(seansaId);
-            ObjPodaciScreen.getInstance(seansaId).setVisible(true);
-            }
-        });
-        btnBeleske.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-
-                BeleskeScreen.getInstance(seansa);
-                BeleskeScreen.getInstance(seansa).setVisible(true);
-
-            }
+    private void registerActions() {
+        btnBeleske.addActionListener(_ -> {
+            BeleskeScreen.getInstance(seansa).setVisible(true);
         });
 
+        btnObjavljeniPodaci.addActionListener(_ -> {
+            frameObjavljeniPodaci.setContentPane(ObjavljeniPodaci.getInstance(seansa));
+            frameObjavljeniPodaci.setVisible(true);
+        });
     }
 }

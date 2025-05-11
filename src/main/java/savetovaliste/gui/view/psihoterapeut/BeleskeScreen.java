@@ -33,7 +33,7 @@ public class BeleskeScreen extends JFrame {
 
     private void init() {
         this.setTitle("Beleske");
-        this.setSize(800, 600);
+        this.setSize(700, 420);
         contentPane = new JPanel();
         contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
         contentPane.setLayout(new BorderLayout(0, 0));
@@ -43,9 +43,9 @@ public class BeleskeScreen extends JFrame {
         table = new JTable();
         scrollPane = new ScrollPane();
         tableModel = new DefaultTableModel();
+        table.setModel(tableModel);
         tableModel.addColumn("ID Beleske");
         tableModel.addColumn("Tekst beleske");
-        table.setModel(tableModel);
         scrollPane.add(table);
         contentPane.add(scrollPane, BorderLayout.CENTER);
         try {
@@ -56,9 +56,8 @@ public class BeleskeScreen extends JFrame {
         tableModel.setRowCount(0);
         for(Beleske beleske : beleske){
             int belskeId = beleske.getId();
-            String text =beleske.getText();
+            String text = beleske.getText();
             tableModel.addRow(new Object[]{belskeId,text});
         }
-
     }
 }
