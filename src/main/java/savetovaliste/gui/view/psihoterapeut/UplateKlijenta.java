@@ -18,7 +18,7 @@ public class UplateKlijenta extends JFrame {
     private JPanel contentPane;
     private JLabel lblUplate;
     private int klijent_id;
-    Klijent klijent;
+    private Klijent klijent;
     private ArrayList<Placanje> placanja = new ArrayList<>();
 
     private JTable table;

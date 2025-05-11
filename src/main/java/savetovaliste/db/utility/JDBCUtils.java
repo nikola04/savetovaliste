@@ -498,4 +498,34 @@ public class JDBCUtils {
         stmt.close();
         return testiranja;
     }
+
+    public static ObjavljivanjePodataka getObjPodatke(int seansaId)throws SQLException {
+        String sql = "SELECT * FROM  objavljivanje_podataka WHERE seansa_id = ?";
+        PreparedStatement stmt = DBUtil.getConnection().prepareStatement(sql);
+        stmt.setInt(1, seansaId);
+        ResultSet rs = stmt.executeQuery();
+        if (rs.next()) {
+            int objavljivanjeId = rs.getInt("objavljivanje_id");
+            Date datum = rs.getDate("datum_objave");
+            String razlog = rs.getString("razlog");
+            String kome= rs.getString("kome");
+            ObjavljivanjePodataka obj = new ObjavljivanjePodataka(objavljivanjeId,seansaId,datum,razlog,kome);
+            return obj;
+        }
+        rs.close();
+        stmt.close();
+        return null;
+    }
+
+    public static void setObjPodataka(int seansaId, RazlogObjave razlogObjave, Date date,String kome) throws SQLException {
+        String sql = "{CALL insert_objavljivanje(?, ?, ?,?)}";
+        PreparedStatement stmt = DBUtil.getConnection().prepareStatement(sql);
+        stmt.setInt(1, seansaId);
+        stmt.setString(2, razlogObjave.toString());
+        stmt.setDate(3, date);
+        stmt.setString(4,kome);
+        stmt.execute();
+        stmt.close();
+        return;
+    }
 }
