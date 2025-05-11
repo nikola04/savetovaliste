@@ -99,7 +99,6 @@ public class JDBCUtils {
             boolean naRate = rs.getBoolean("na_rate");
             boolean placeno = rs.getBoolean("placeno");
 
-
             Seansa seansa = new Seansa(seansaId, klijent, datum, vreme, trajanje, prva, naRate, placeno, cenaSeanse);
             seanse.add(seansa);
         }
@@ -354,7 +353,6 @@ public class JDBCUtils {
             int cenaId = rs.getInt("cena_seanse_id");
             int cena = rs.getInt("cena");
             Date datumPromene = rs.getDate("datum_promene");
-            int placanjeid = rs.getInt("placanje_id");
             CenaSeanse cenaSeanse = new CenaSeanse(cenaId,cena,datumPromene);
             Klijent klijent= new Klijent(klijentId,ime,prezime,email,telefon,pol,datumRodjenja, ranijeTerapije);
 
@@ -364,9 +362,7 @@ public class JDBCUtils {
         rs.close();
         stmt.close();
         return seansa;
-
     }
-
 
     public static ArrayList<Struka> getStruke() throws SQLException {
         String sql = "SELECT * FROM struka";
