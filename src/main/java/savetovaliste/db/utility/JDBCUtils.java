@@ -38,8 +38,6 @@ public class JDBCUtils {
         Statement stmt = DBUtil.getConnection().createStatement();
         ResultSet rs = stmt.executeQuery(sql);
         ArrayList<Psihoterapeut> psihoterapeuti = new ArrayList<>();
-
-
         while (rs.next()) {
             int id = rs.getInt("psihoterapeut_id");
             String ime = rs.getString("ime");
@@ -106,6 +104,9 @@ public class JDBCUtils {
             seanse.add(seansa);
         }
 
+        rs.close();
+        stmt.close();
+
         return seanse;
     }
     public static Klijent getKlijent(int klijentId) throws SQLException {
@@ -128,6 +129,9 @@ public class JDBCUtils {
             System.out.println("nema Klijenta sa tim id");
             return null;
         }
+
+        rs.close();
+        stmt.close();
 
         return klijent;
     }
@@ -263,7 +267,8 @@ public class JDBCUtils {
             Klijent k = new Klijent(klijentId,ime,prezime,email,telefon,pol,datumRodjenja, ranijeTerapije);
             klijenti.add(k);
         }
-
+        rs.close();
+        stmt.close();
         return klijenti;
     }
     public static ArrayList<Seansa> getBuduceSeanse(Psihoterapeut psihoterapeut) throws SQLException {
@@ -314,7 +319,8 @@ public class JDBCUtils {
             Seansa seansa = new Seansa(seansaId, klijent, datum, vreme, trajanje, prva, naRate, placeno, cenaSeanse);
             seanse.add(seansa);
         }
-
+        rs.close();
+        stmt.close();
         return seanse;
     }
     public static Seansa getSeansa(int seansaId) throws SQLException {
@@ -356,6 +362,8 @@ public class JDBCUtils {
             seansa = new Seansa(id,klijent,datumSeanse,vreme,trajanje,prva,naRate,placeno,cenaSeanse);
 
         }
+        rs.close();
+        stmt.close();
         return seansa;
 
     }
@@ -454,20 +462,18 @@ public class JDBCUtils {
     }
 
     public static ArrayList<Beleske> getBeleske(Seansa seansa) throws SQLException {
-        String sql = "SELECT * FROM beleske WHERE seansa_id = ?";
+        String sql = "SELECT beleske_id, tekst  FROM beleske WHERE seansa_id = ?";
         PreparedStatement stmt = DBUtil.getConnection().prepareStatement(sql);
         stmt.setInt(1, seansa.getId());
         ResultSet rs = stmt.executeQuery();
-        ArrayList<Beleske> beleskeList= new ArrayList<Beleske>();
+        ArrayList<Beleske> beleskeList = new ArrayList<Beleske>();
         while (rs.next()) {
-          int beleskeId = rs.getInt("beleske_id");
-          String tekstBeleske = rs.getString("tekst");
-          Beleske b = new Beleske(beleskeId,tekstBeleske,seansa);
-          beleskeList.add(b);
+            int id = rs.getInt("beleske_id");
+            String tekst = rs.getString("tekst");
+            beleskeList.add(new Beleske(id, tekst, seansa));
         }
         rs.close();
         stmt.close();
-
         return beleskeList;
     }
 }
