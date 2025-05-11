@@ -131,6 +131,87 @@ public class JDBCUtils {
 
         return klijent;
     }
+
+    public static ArrayList<Neplaceno> getNeplaceno(Klijent klijent) throws SQLException {
+        String sql = "SELECT testiranje_id as id, 'testiranje' as tip, te.cena as iznos, FALSE as istekao_rok\n" +
+                "FROM testiranje AS t INNER JOIN test as te ON te.test_id = t.test_id \n" +
+                "INNER JOIN seansa AS s ON t.seansa_id = s.seansa_id\n" +
+                "WHERE t.placanje_id IS NULL AND s.klijent_id = ? \n" +
+                "\n" +
+                "UNION\n" +
+                "\n" +
+                "SELECT \n" +
+                "    s.seansa_id as id, 'seansa' as tip, cs.cena as iznos,\n" +
+                "    CASE \n" +
+                "        WHEN s.na_rate = 1 AND p1.datum IS NOT NULL AND p2.placanje_id IS NULL \n" +
+                "             AND DATE_ADD(p1.datum, INTERVAL 30 DAY) < CURRENT_DATE\n" +
+                "        THEN TRUE\n" +
+                "        ELSE FALSE\n" +
+                "    END AS istekao_rok\n" +
+                "FROM seansa s\n" +
+                "LEFT JOIN placanje p1 ON p1.seansa_id = s.seansa_id AND p1.rata = 1\n" +
+                "LEFT JOIN placanje p2 ON p2.seansa_id = s.seansa_id AND p2.rata = 2\n" +
+                "INNER JOIN cena_seanse cs ON cs.cena_seanse_id = s.cena_seanse_id\n" +
+                "WHERE s.klijent_id = ? AND (\n" +
+                "    (s.na_rate = 0 AND NOT EXISTS (\n" +
+                "        SELECT 1 FROM placanje p \n" +
+                "        WHERE p.seansa_id = s.seansa_id AND p.iznos >= cs.cena\n" +
+                "    ))\n" +
+                "    OR\n" +
+                "    (s.na_rate = 1 AND (\n" +
+                "        p1.placanje_id IS NULL\n" +
+                "        OR\n" +
+                "        p1.iznos < 0.3 * cs.cena\n" +
+                "        OR\n" +
+                "        (p2.placanje_id IS NULL AND p1.datum IS NOT NULL AND DATE_ADD(p1.datum, INTERVAL 30 DAY) < CURRENT_DATE)\n" +
+                "    ))\n" +
+                ");";
+        PreparedStatement stmt = DBUtil.getConnection().prepareStatement(sql);
+        stmt.setInt(1, klijent.getId());
+        stmt.setInt(2, klijent.getId());
+        ResultSet rs = stmt.executeQuery();
+        ArrayList<Neplaceno> neplacene = new ArrayList<>();
+        while (rs.next()) {
+            int id = rs.getInt("id");
+            String tip = rs.getString("tip");
+            double iznos = rs.getDouble("iznos");
+            boolean istekaoRok = rs.getBoolean("istekao_rok");
+
+            neplacene.add(new Neplaceno(id, tip, iznos, istekaoRok));
+        }
+        rs.close();
+        stmt.close();
+        return neplacene;
+    }
+
+    public static ArrayList<Placanje> getPlacanja(Klijent klijent) throws SQLException {
+        String sql = "SELECT p.placanje_id, iznos, iznos_sa_provizijom, valuta_valuta_id as valuta_id, v.pun_naziv as valuta, v.skraceni_naziv as valuta_s, datum as datum_placanja, nacin_placanja, svrha_placanja, rata, s.seansa_id as seansa, na_rate FROM placanje as p INNER JOIN seansa as s ON s.seansa_id = p.seansa_id INNER JOIN valuta as v ON p.valuta_valuta_id = v.valuta_id WHERE s.klijent_id = ?";
+        PreparedStatement stmt = DBUtil.getConnection().prepareStatement(sql);
+        stmt.setInt(1, klijent.getId());
+        ResultSet rs = stmt.executeQuery();
+        ArrayList<Placanje> placanja = new ArrayList<>();
+        while (rs.next()) {
+            int placanjeId = rs.getInt("placanje_id");
+            int seansaId = rs.getInt("seansa");
+            double iznos = rs.getDouble("iznos");
+            double iznosSaProvizijom = rs.getDouble("iznos_sa_provizijom");
+            int valutaId = rs.getInt("valuta_id");
+            String valutaD = rs.getString("valuta");
+            String valutaS = rs.getString("valuta_s");
+            String svrhaPlacanja = rs.getString("svrha_placanja");
+            Date datumPlacanja = rs.getDate("datum_placanja");
+            String nacinPlacanja = rs.getString("nacin_placanja");
+            boolean naRate = rs.getBoolean("na_rate");
+            int rata = rs.getInt("rata");
+
+            Valuta valuta = new Valuta(valutaId, valutaS, valutaD);
+            placanja.add(new Placanje(placanjeId, klijent, iznos, iznosSaProvizijom, valuta, nacinPlacanja, svrhaPlacanja, datumPlacanja, rata, naRate, seansaId));
+        }
+        rs.close();
+        stmt.close();
+        return placanja;
+    }
+
     public static ArrayList<Klijent> getKlijents() throws SQLException {
         String sql = "SELECT k.* " +
                 "FROM klijent k " +

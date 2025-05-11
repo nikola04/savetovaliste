@@ -22,6 +22,8 @@ public class PaymentsScreen  extends JPanel implements ISubscriber {
     private JScrollPane scrollPane;
     private DefaultTableModel modelKlijenti;
 
+    private JFrame frameUplateKlijenta;
+    private JFrame frameDugovanjeKlijenta;
 
     public static PaymentsScreen getInstance(){
         if(instance == null) {
@@ -59,10 +61,8 @@ public class PaymentsScreen  extends JPanel implements ISubscriber {
         setTables();
         klijentiTable.getColumn("Uplate").setCellRenderer(new BtnRenderer());
         klijentiTable.getColumn("Dugovanja").setCellRenderer(new BtnRenderer());
-        klijentiTable.getColumn("Uplate").setCellEditor(new BtnEditor(klijentiTable,"Uplata"));
+        klijentiTable.getColumn("Uplate").setCellEditor(new BtnEditor(klijentiTable,"Uplate"));
         klijentiTable.getColumn("Dugovanja").setCellEditor(new BtnEditor(klijentiTable,"Dugovanja"));
-
-
     }
 
     private void setTables() {

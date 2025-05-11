@@ -15,26 +15,30 @@ public class DugovanjeKlijenta extends JFrame {
     private int klijent_id;
     private Klijent klijent;
 
-    public DugovanjeKlijenta(int klijent_id) throws HeadlessException {
+    private DugovanjeKlijenta() {
         super("Dugovanja Klijenta");
-        this.klijent_id = klijent_id;
-        try {
-            klijent = JDBCUtils.getKlijent(klijent_id);
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
     }
 
     public static DugovanjeKlijenta getInstance(int klijent_id) {
         if (instance == null) {
-            instance = new DugovanjeKlijenta(klijent_id);
+            instance = new DugovanjeKlijenta();
             instance.initialize();
             //instance.initializeGUI();
             //instance.fetchData();
 
         }
+        instance.klijent_id = klijent_id;
+        instance.fetchData();
         return instance;
 
+    }
+
+    private void fetchData() {
+        try {
+            klijent = JDBCUtils.getKlijent(klijent_id);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private void initialize() {

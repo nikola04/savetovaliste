@@ -37,7 +37,7 @@ public Object getCellEditorValue() {
 public void actionPerformed(ActionEvent e) {
     int row = table.getSelectedRow();
     int klijentId = (int) table.getValueAt(row, 0);  // pretpostavljam ID je u prvoj koloni
-    if (label.equals("Uplata")) {
+    if (label.equals("Uplate")) {
         UplateKlijenta.getInstance(klijentId);
         UplateKlijenta.getInstance(klijentId).setVisible(true);
 
