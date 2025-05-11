@@ -133,7 +133,7 @@ public class JDBCUtils {
     }
 
     public static ArrayList<Neplaceno> getNeplaceno(Klijent klijent) throws SQLException {
-        String sql = "SELECT testiranje_id as id, 'testiranje' as tip, te.cena as iznos, FALSE as na_rate, FALSE as placeno, FALSE as istekao_rok\n" +
+        String sql = "SELECT testiranje_id as id, 'testiranje' as tip, te.cena as iznos, FALSE as na_rate, FALSE as placeno, te.cena as nedostaje, FALSE as istekao_rok\n" +
                 "FROM testiranje AS t INNER JOIN test as te ON te.test_id = t.test_id \n" +
                 "INNER JOIN seansa AS s ON t.seansa_id = s.seansa_id\n" +
                 "WHERE t.placanje_id IS NULL AND s.klijent_id = ? \n" +
@@ -148,6 +148,11 @@ public class JDBCUtils {
                 "        THEN TRUE\n" +
                 "        ELSE FALSE\n" +
                 "    END as placeno,\n" +
+                "    CASE\n" +
+                "    \tWHEN (p1.iznos * k1.kurs_din + p2.iznos * k2.kurs_din) >= cs.cena\n" +
+                "        THEN 0\n" +
+                "        ELSE (cs.cena - COALESCE(p1.iznos * k1.kurs_din + p2.iznos * k2.kurs_din, 0))\n" +
+                "    END as nedostaje,\n" +
                 "    CASE \n" +
                 "        WHEN s.na_rate = 1 AND (\n" +
                 "            (p2.placanje_id IS NULL AND DATE_ADD(s.dan, INTERVAL 30 DAY) < CURRENT_DATE)\n" +
@@ -199,8 +204,9 @@ public class JDBCUtils {
             boolean naRate = rs.getBoolean("na_rate");
             boolean placeno = rs.getBoolean("placeno");
             boolean istekaoRok = rs.getBoolean("istekao_rok");
+            double nedostaje = rs.getDouble("nedostaje");
 
-            neplacene.add(new Neplaceno(id, tip, iznos, placeno, naRate, istekaoRok));
+            neplacene.add(new Neplaceno(id, tip, iznos, nedostaje, placeno, naRate, istekaoRok));
         }
         rs.close();
         stmt.close();

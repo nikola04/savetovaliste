@@ -1,12 +1,14 @@
 package savetovaliste.gui.view.psihoterapeut;
 
 import savetovaliste.db.utility.JDBCUtils;
-import savetovaliste.model.Klijent;
+import savetovaliste.model.*;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
+import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.sql.SQLException;
+import java.util.ArrayList;
 
 public class DugovanjeKlijenta extends JFrame {
     private static DugovanjeKlijenta instance;
@@ -14,6 +16,11 @@ public class DugovanjeKlijenta extends JFrame {
     private JLabel lblDugovanje;
     private int klijent_id;
     private Klijent klijent;
+    private ArrayList<Neplaceno> neplaceno = new ArrayList<>();
+
+    private JTable table;
+    private JScrollPane scrollPane;
+    private DefaultTableModel tableModel;
 
     private DugovanjeKlijenta() {
         super("Dugovanja Klijenta");
@@ -23,19 +30,18 @@ public class DugovanjeKlijenta extends JFrame {
         if (instance == null) {
             instance = new DugovanjeKlijenta();
             instance.initialize();
-            //instance.initializeGUI();
-            //instance.fetchData();
-
         }
         instance.klijent_id = klijent_id;
         instance.fetchData();
         return instance;
-
     }
 
     private void fetchData() {
         try {
             klijent = JDBCUtils.getKlijent(klijent_id);
+            if(klijent == null) return;
+            neplaceno = JDBCUtils.getNeplaceno(klijent);
+            this.updateTable();
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -49,5 +55,33 @@ public class DugovanjeKlijenta extends JFrame {
         lblDugovanje = new JLabel("Dugovanja Klijenta");
         contentPane.add(lblDugovanje);
 
+        table = new JTable();
+        scrollPane = new JScrollPane(table);
+        tableModel = new DefaultTableModel();
+
+        tableModel.addColumn("ID");
+        tableModel.addColumn("Tip");
+        tableModel.addColumn("Iznos");
+        tableModel.addColumn("Nedostaje");
+        tableModel.addColumn("Placeno");
+        tableModel.addColumn("Rata");
+
+        table.setModel(tableModel);
+        this.add(scrollPane);
+    }
+
+    private void updateTable(){
+        tableModel.setRowCount(0);
+        for(Neplaceno n : neplaceno) {
+            String rate = "";
+            if(n.isNaRate() && n.isIstekaoRok())
+                rate = "Istekao rok";
+            else if (!n.isNaRate()) {
+                rate = "Nema";
+            } else rate = "Nema rate";
+
+            tableModel.addRow(new Object[] { n.getId(), n.getTip(), n.getIznos(), n.getNedostaje(), n.isPlaceno() ? "Da" : "Ne", rate });
+        }
+        table.repaint();
     }
 }
