@@ -8,6 +8,8 @@ import savetovaliste.model.Seansa;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.sql.SQLException;
 
 public class SeansaInfoScreen extends JFrame {
@@ -34,6 +36,7 @@ public class SeansaInfoScreen extends JFrame {
     private JLabel lblKlijentTelefon;
     private JLabel lblklijentRanijeTerapije;
     private JLabel lblKlijentBrojPrijave;
+    private JButton btnBeleske;
     public static SeansaInfoScreen getInstance(int id){
         if(instance == null){
             instance = new SeansaInfoScreen();
@@ -56,7 +59,7 @@ public class SeansaInfoScreen extends JFrame {
         lblPrva.setText("Da li je prva seansa: " + (seansa.isPrva()? "Jeste": "Nije prva"));
         lblDan.setText("Datum Seanse: " + seansa.getDatum());
         lblVreme.setText("Vreme Seanse: " + seansa.getVreme());
-        lblVremeTrajanja.setText("Vreme Trajanja Seanse: " + seansa.getTrajanje() +"h");
+        lblVremeTrajanja.setText("Vreme Trajanja Seanse: " + seansa.getTrajanje() +"min");
         lblNaRate.setText("Placanje na rate: " + (seansa.isNaRate()? "DA": "NE"));
         lblPlaceno.setText("Placeno: "+ (seansa.isPlaceno()? "Jeste": "Nije Placeno"));
 
@@ -147,6 +150,9 @@ public class SeansaInfoScreen extends JFrame {
         lblKlijentBrojPrijave = new JLabel("Broj Prijave: ");
         lblKlijentBrojPrijave.setPreferredSize(new Dimension(200, 50));
         lblKlijentBrojPrijave.setFont(new Font("Arial", Font.BOLD, 15));
+        btnBeleske = new JButton("Pogledaj Beleske sa Seanse");
+        btnBeleske.setFont(new Font("Arial", Font.BOLD, 10));
+        btnBeleske.setPreferredSize(new Dimension(200, 50));
 
 
 
@@ -165,6 +171,8 @@ public class SeansaInfoScreen extends JFrame {
         contentPane.add(lblNaRate, gbc);
         gbc.gridy = 6;
         contentPane.add(lblPlaceno, gbc);
+        gbc.gridy = 7;
+        contentPane.add(btnBeleske, gbc);
         gbc.gridx = 1;
         gbc.gridy = 0;
         contentPane.add(lblKlijentID, gbc);
@@ -191,9 +199,13 @@ public class SeansaInfoScreen extends JFrame {
         contentPane.add(lblCena, gbc);
         gbc.gridy = 1;
         contentPane.add(cena, gbc);
+        btnBeleske.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                BeleskeScreen.getInstance(seansaId);
+                BeleskeScreen.getInstance(seansaId).setVisible(true);
 
-
-
+            }
+        });
 
     }
 }

@@ -45,7 +45,7 @@ public class UplateKlijenta extends JFrame {
             placanja = JDBCUtils.getPlacanja(klijent);
             this.updateTable();
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            e.printStackTrace();
         }
     }
 
