@@ -48,8 +48,11 @@ public class BeleskeScreen extends JFrame {
         lblBeleske = new JLabel("Beleske sa  Seanse: " + seansa.getId());
         btnDodaj = new JButton("Dodaj belesku");
         btnObrisi = new JButton("Obrisi belesku");
+        btnDodaj.setBackground(Color.GREEN);
+        btnObrisi.setBackground(Color.RED);
         contentPane.add(lblBeleske, BorderLayout.NORTH);
         table = new JTable();
+        table.setBackground(Color.LIGHT_GRAY);
         scrollPane = new ScrollPane();
         tableModel = new DefaultTableModel(){
             @Override
@@ -57,6 +60,7 @@ public class BeleskeScreen extends JFrame {
                 return column == 1;
             }
         };
+        scrollPane.setBackground(Color.LIGHT_GRAY);
         table.setModel(tableModel);
         tableModel.addColumn("ID Beleske");
         tableModel.addColumn("Tekst beleske");

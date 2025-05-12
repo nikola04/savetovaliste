@@ -34,6 +34,7 @@ public class PastSessionsScreen extends JPanel implements ISubscriber {
         Session.getInstance().addSubscriber(this);
 
         model = new DefaultTableModel();
+
     }
 
     private void initializeGUI() {
@@ -55,9 +56,11 @@ public class PastSessionsScreen extends JPanel implements ISubscriber {
         model.addColumn("Vise o Seansi");
 
         table = new JTable(model);
+        table.setBackground(Color.CYAN);
 
 
         JScrollPane scrollPane = new JScrollPane(table);
+        scrollPane.setBackground(Color.LIGHT_GRAY);
         add(Box.createVerticalStrut(10));
         add(scrollPane);
     }

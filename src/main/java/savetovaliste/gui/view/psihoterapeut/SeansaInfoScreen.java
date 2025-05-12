@@ -4,6 +4,7 @@ import savetovaliste.db.utility.JDBCUtils;
 import savetovaliste.model.CenaSeanse;
 import savetovaliste.model.Klijent;
 import savetovaliste.model.Seansa;
+import savetovaliste.model.Test;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -42,6 +43,7 @@ public class SeansaInfoScreen extends JFrame {
 
     private final JButton btnBeleske = new JButton("Pogledaj Beleske sa Seanse");
     private final JButton btnObjavljeniPodaci = new JButton("Objavljeni Podaci");
+    private final JButton btnTestovi = new JButton("Testovi Seanse");
 
     public static SeansaInfoScreen getInstance(int id){
         if(instance == null){
@@ -108,6 +110,7 @@ public class SeansaInfoScreen extends JFrame {
         JPanel btnPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
         btnPanel.add(btnBeleske);
         btnPanel.add(btnObjavljeniPodaci);
+        btnPanel.add(btnTestovi);
         add(btnPanel, BorderLayout.CENTER);
 
         frameObjavljeniPodaci = new JFrame("Objavljeni podaci");
@@ -172,6 +175,9 @@ public class SeansaInfoScreen extends JFrame {
         btnObjavljeniPodaci.addActionListener(_ -> {
             frameObjavljeniPodaci.setContentPane(ObjavljeniPodaci.getInstance(seansa));
             frameObjavljeniPodaci.setVisible(true);
+        });
+        btnTestovi.addActionListener(_ -> {
+            TestScreen.getInstance().setVisible(true);
         });
     }
 }

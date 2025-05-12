@@ -1,5 +1,6 @@
 package savetovaliste.gui.view.psihoterapeut;
 
+import org.w3c.dom.Text;
 import savetovaliste.Session;
 import savetovaliste.controller.observer.ISubscriber;
 import savetovaliste.model.Psihoterapeut;
@@ -97,6 +98,7 @@ public class MainScreenPsih extends JPanel implements ISubscriber {
         add(headingPanel, BorderLayout.NORTH);
 
         JPanel mainPanel = new JPanel();
+        mainPanel.setBackground(Color.LIGHT_GRAY);
         mainPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 10, 10));
 
         addButton(mainPanel, btnShowProfile);
