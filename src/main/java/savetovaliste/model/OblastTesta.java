@@ -13,4 +13,8 @@ public class OblastTesta {
     public String getNaziv() {
         return naziv;
     }
+    @Override
+    public String toString() {
+        return naziv;
+    }
 }

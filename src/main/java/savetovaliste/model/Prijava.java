@@ -1,17 +1,22 @@
 package savetovaliste.model;
 
 public class Prijava {
-    private final Integer id;
+    private final int id;
     private final Klijent klijent;
     private final Psihoterapeut psihoterapeut;
 //    private final Kandidat kandidat;
-    public Prijava(Integer id, Klijent klijent, Psihoterapeut psihoterapeut) {
+    public Prijava(int id, Klijent klijent) {
+        this.id = id;
+        this.klijent = klijent;
+        this.psihoterapeut = null;
+    }
+    public Prijava(int id, Klijent klijent, Psihoterapeut psihoterapeut) {
         this.id = id;
         this.klijent = klijent;
         this.psihoterapeut = psihoterapeut;
     }
 
-    public Integer getId() {
+    public int getId() {
         return id;
     }
     public Klijent getKlijent() {

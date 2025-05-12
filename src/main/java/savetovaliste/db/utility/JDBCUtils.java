@@ -345,7 +345,6 @@ public class JDBCUtils {
             String pol = rs.getString("pol");
             boolean ranijeTerapije = rs.getBoolean("ranije_terapije");
 
-
             boolean prva =rs.getBoolean("prva");
             Date datumSeanse = rs.getDate("dan");
             Time vreme = rs.getTime("vreme");
@@ -355,11 +354,14 @@ public class JDBCUtils {
             int cenaId = rs.getInt("cena_seanse_id");
             int cena = rs.getInt("cena");
             Date datumPromene = rs.getDate("datum_promene");
+
+            int prijavaId = rs.getInt("prijava_id");
+
             CenaSeanse cenaSeanse = new CenaSeanse(cenaId,cena,datumPromene);
-            Klijent klijent= new Klijent(klijentId,ime,prezime,email,telefon,pol,datumRodjenja, ranijeTerapije);
+            Klijent klijent = new Klijent(klijentId,ime,prezime,email,telefon,pol,datumRodjenja, ranijeTerapije);
+            klijent.setPrijava(new Prijava(prijavaId, klijent));
 
             seansa = new Seansa(id,klijent,datumSeanse,vreme,trajanje,prva,naRate,placeno,cenaSeanse);
-
         }
         rs.close();
         stmt.close();
@@ -454,8 +456,11 @@ public class JDBCUtils {
                 return -2;
             if (e.getMessage().contains("unique_sertifikat_id"))
                 return -3;
-            return -4;
+        }catch (SQLException e) {
+            if(e.getMessage().contains("sertifikat_not_found"))
+                return -4;
         }
+        return -5;
     }
 
     public static ArrayList<Beleske> getBeleske(Seansa seansa) throws SQLException {
@@ -474,8 +479,12 @@ public class JDBCUtils {
         return beleskeList;
     }
 
-    public static ArrayList<Testiranje> getTestiranje(Seansa seansa) throws SQLException {
-        String sql = "SELECT t.testiranje_id, t.rezultat, t.test_id, te.naziv, te.cena, te.oblast_testa_id as oblast_id, ot.naziv as oblast \n" +
+    public static ArrayList<Testiranje> getTestiranja(Seansa seansa) throws SQLException {
+        String sql = "SELECT t.testiranje_id, t.rezultat, t.test_id, te.naziv, te.cena, te.oblast_testa_id as oblast_id, ot.naziv as oblast, CASE \n" +
+                "\tWHEN t.placanje_id IS NOT NULL\n" +
+                "    THEN TRUE\n" +
+                "    ELSE FALSE\n" +
+                "END as placeno\n" +
                 "FROM testiranje as t\n" +
                 "INNER JOIN test as te ON te.test_id = t.test_id\n" +
                 "INNER JOIN oblast_test as ot ON ot.oblast_testa_id = te.oblast_testa_id\n" +
@@ -492,9 +501,10 @@ public class JDBCUtils {
             String naziv = rs.getString("naziv");
             int cena = rs.getInt("cena");
             String oblast = rs.getString("oblast");
+            boolean placeno = rs.getBoolean("placeno");
             OblastTesta oblastTesta = new OblastTesta(oblastId, oblast);
             Test test = new Test(testId, naziv, cena, oblastTesta);
-            testiranja.add(new Testiranje(id, test, rezultat, seansa));
+            testiranja.add(new Testiranje(id, test, rezultat, seansa, placeno));
         }
         rs.close();
         stmt.close();
@@ -540,10 +550,6 @@ public class JDBCUtils {
         stmt.close();
     }
 
-    public static Beleske getBeleskeById(int beleskaId) throws SQLException {
-       return null;
-    }
-
     public static void removeBeleske(int beleskaId) throws SQLException{
         String sql = "{CALL delete_beleska(?)}";
         PreparedStatement stmt = getConnection().prepareStatement(sql);
@@ -560,5 +566,31 @@ public class JDBCUtils {
         stmt.setString(2, newText);
         stmt.executeUpdate();
         stmt.close();
+    }
+
+    public static ArrayList<Test> getTestovi() throws SQLException {
+        String sql = "SELECT test_id, t.naziv, cena, t.oblast_testa_id as oblast_id, ot.naziv as oblast " +
+                "FROM test as t " +
+                "INNER JOIN oblast_test as ot ON t.oblast_testa_id = ot.oblast_testa_id;";
+        Statement stmt = getConnection().createStatement();
+        ResultSet rs = stmt.executeQuery(sql);
+        ArrayList<Test> testovi = new ArrayList<>();
+
+        while(rs.next()) {
+            int id = rs.getInt("test_id");
+            String naziv = rs.getString("naziv");
+            int cena = rs.getInt("cena");
+            int oblastId = rs.getInt("oblast_id");
+            String oblast = rs.getString("oblast");
+            OblastTesta oblastTesta = new OblastTesta(oblastId, oblast);
+            testovi.add(new Test(id, naziv, cena, oblastTesta));
+        }
+        rs.close();
+        stmt.close();
+        return testovi;
+    }
+
+    public static void addTestiranje(int testId, double rezultat, int seansaId) throws SQLException{
+
     }
 }

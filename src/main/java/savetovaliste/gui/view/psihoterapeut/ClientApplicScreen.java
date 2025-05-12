@@ -8,6 +8,7 @@ import savetovaliste.model.Prijava;
 import savetovaliste.model.Psihoterapeut;
 
 import javax.swing.*;
+import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.sql.SQLException;
@@ -51,8 +52,9 @@ public class ClientApplicScreen extends JPanel implements ISubscriber {
         model.addColumn("Ranije terapije");
 
         table = new JTable(model);
-
         JScrollPane scrollPane = new JScrollPane(table);
+
+        scrollPane.setBorder(new EmptyBorder(10, 10, 10, 10));
         lblHeading.setAlignmentX(Component.CENTER_ALIGNMENT);
         add(Box.createVerticalStrut(10));
         add(lblHeading);

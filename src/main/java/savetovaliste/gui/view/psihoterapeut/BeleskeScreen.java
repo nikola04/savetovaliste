@@ -16,139 +16,120 @@ import java.awt.event.ActionListener;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
-public class BeleskeScreen extends JFrame {
-    private JPanel contentPane;
-    private JLabel lblBeleske;
+public class BeleskeScreen extends JPanel {
     private static BeleskeScreen instance;
     private Seansa seansa;
     private JTable table;
     private DefaultTableModel tableModel;
-    private ScrollPane scrollPane;
-    private ArrayList<Beleske> beleske;
     private JButton btnDodaj;
     private JButton btnObrisi;
-    JPanel verticalPanel;
 
+    private BeleskeScreen() {
+    }
     public static BeleskeScreen getInstance(Seansa seansa) {
         if(instance == null){
             instance = new BeleskeScreen();
+            instance.initialize();
+            instance.initializeControllers();
         }
-        instance.seansa= seansa;
-        instance.init();
+        instance.seansa = seansa;
+        instance.fetchData();
         return instance;
     }
 
-    private void init() {
-        this.setTitle("Beleske");
-        this.setSize(700, 420);
-        contentPane = new JPanel();
-        contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
-        contentPane.setLayout(new BorderLayout(0, 0));
-        this.setContentPane(contentPane);
-        lblBeleske = new JLabel("Beleske sa  Seanse: " + seansa.getId());
-        btnDodaj = new JButton("Dodaj belesku");
-        btnObrisi = new JButton("Obrisi belesku");
-        btnDodaj.setBackground(Color.GREEN);
-        btnObrisi.setBackground(Color.RED);
-        contentPane.add(lblBeleske, BorderLayout.NORTH);
-        table = new JTable();
-        table.setBackground(Color.LIGHT_GRAY);
-        scrollPane = new ScrollPane();
-        tableModel = new DefaultTableModel(){
+    private void initialize() {
+        this.setLayout(new BorderLayout());
+
+        tableModel = new DefaultTableModel(new Object[]{ "ID", "Tekst" }, 0){
             @Override
             public boolean isCellEditable(int row, int column) {
                 return column == 1;
             }
         };
-        scrollPane.setBackground(Color.LIGHT_GRAY);
-        table.setModel(tableModel);
-        tableModel.addColumn("ID Beleske");
-        tableModel.addColumn("Tekst beleske");
-        scrollPane.add(table);
-        contentPane.add(scrollPane, BorderLayout.CENTER);
-        verticalPanel = new JPanel();
+        table = new JTable(tableModel);
+
+        JScrollPane scrollPane = new JScrollPane(table);
+        scrollPane.setBorder(new EmptyBorder(10, 10, 10, 10));
+
+        this.add(scrollPane, BorderLayout.CENTER);
+
+        JPanel verticalPanel = new JPanel();
+        verticalPanel.setBorder(new EmptyBorder(20, 10, 35, 10));
         verticalPanel.setLayout(new BoxLayout(verticalPanel, BoxLayout.X_AXIS));
-        verticalPanel.setBorder(new EmptyBorder(50, 50, 50, 50));
+
+        btnDodaj = new JButton("Dodaj belesku");
+        btnObrisi = new JButton("Obrisi belesku");
         verticalPanel.add(btnDodaj);
         verticalPanel.add(btnObrisi);
-        contentPane.add(verticalPanel, BorderLayout.SOUTH);
+
+        this.add(verticalPanel, BorderLayout.SOUTH);
+    }
+
+    private void fetchData(){
         try {
-            beleske = JDBCUtils.getBeleske(seansa);
+            ArrayList<Beleske> beleske = JDBCUtils.getBeleske(seansa);
+            tableModel.setRowCount(0);
+
+            for(Beleske beleska : beleske){
+                int belskeId = beleska.getId();
+                String text = beleska.getText();
+                tableModel.addRow(new Object[]{belskeId,text});
+            }
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        tableModel.setRowCount(0);
-        for(Beleske beleske : beleske){
-            int belskeId = beleske.getId();
-            String text = beleske.getText();
-            tableModel.addRow(new Object[]{belskeId,text});
-        }
-        btnDodaj.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                String newText = JOptionPane.showInputDialog("Unesite tekst nove beleške:");
-                if (newText != null && !newText.trim().isEmpty()) {
-                    // Poziv funkcije za dodavanje beleške u bazu
-                    try {
-                        JDBCUtils.addBeleske(newText,seansa.getId());
-                    } catch (SQLException ex) {
-                        ex.printStackTrace();
-                    }
-                    init();
+    }
+
+   private void initializeControllers(){
+        btnDodaj.addActionListener(e -> {
+            String newText = JOptionPane.showInputDialog("Unesite tekst nove beleške:");
+            if (newText != null && !newText.trim().isEmpty()) {
+                try {
+                    JDBCUtils.addBeleske(newText,seansa.getId());
+                    fetchData();
+                } catch (SQLException ex) {
+                    JOptionPane.showMessageDialog(null, "Desila se greska. Molimo vas pokusajte ponovo.", "Greska", JOptionPane.ERROR_MESSAGE);
+                    ex.printStackTrace();
                 }
             }
         });
-        btnObrisi.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                int selectedRow = table.getSelectedRow();
-                if (selectedRow != -1) {
-                    int beleskaId = (int) tableModel.getValueAt(selectedRow, 0);
-                    try {
-                        JDBCUtils.removeBeleske(beleskaId);
-                    } catch (SQLException ex) {
-                        ex.printStackTrace();
-                    }
-                    init();
-                } else {
-                    JOptionPane.showMessageDialog(contentPane, "Izaberite belešku za brisanje.", "Greška", JOptionPane.WARNING_MESSAGE);
+        btnObrisi.addActionListener(e -> {
+            int selectedRow = table.getSelectedRow();
+            if (selectedRow != -1) {
+                int beleskaId = (int) tableModel.getValueAt(selectedRow, 0);
+                try {
+                    JDBCUtils.removeBeleske(beleskaId);
+                    fetchData();
+                } catch (SQLException ex) {
+                    JOptionPane.showMessageDialog(null, "Desila se greska. Molimo vas pokusajte ponovo.", "Greska", JOptionPane.ERROR_MESSAGE);
+                    ex.printStackTrace();
                 }
+            } else {
+                JOptionPane.showMessageDialog(null, "Izaberite belešku za brisanje.", "Greška", JOptionPane.WARNING_MESSAGE);
             }
         });
-        tableModel.addTableModelListener(new TableModelListener(){
-            @Override
-            public void tableChanged(TableModelEvent e) {
-                if (e.getType() == TableModelEvent.UPDATE) {
-                    int row = e.getFirstRow();
-                    int col = e.getColumn();
+        tableModel.addTableModelListener(e -> {
+            if (e.getType() == TableModelEvent.UPDATE) {
+                int row = e.getFirstRow();
+                int col = e.getColumn();
 
-                    // Ako se menja tekst (npr. kolona 1)
-                    if (col == 1) {
-                        int beleskaId = (int) tableModel.getValueAt(row, 0);
-                        String noviTekst = (String) tableModel.getValueAt(row, 1);
+                if (col != 1)
+                    return;
 
-                        int izbor = JOptionPane.showConfirmDialog(
-                                null,
-                                "Da li želite da sačuvate izmene u belešci?",
-                                "Potvrda izmene",
-                                JOptionPane.YES_NO_OPTION
-                        );
+                int beleskaId = (int) tableModel.getValueAt(row, 0);
+                String noviTekst = (String) tableModel.getValueAt(row, 1);
 
-                        if (izbor == JOptionPane.YES_OPTION) {
-                            try {
-                                JDBCUtils.updateBeleska(beleskaId, noviTekst);
-                                JOptionPane.showMessageDialog(null, "Uspešno izmenjena beleška.");
-                            } catch (SQLException ex) {
-                                ex.printStackTrace();
-                                JOptionPane.showMessageDialog(null, "Greška prilikom izmene beleške.");
-                            }
-                        }else {
-                            init();
-                        }
-
+                if (JOptionPane.showConfirmDialog(null, "Da li želite da sačuvate izmene u belešci?", "Potvrda izmene", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
+                    try {
+                        JDBCUtils.updateBeleska(beleskaId, noviTekst);
+                        JOptionPane.showMessageDialog(null, "Uspešno izmenjena beleška.");
+                    } catch (SQLException ex) {
+                        JOptionPane.showMessageDialog(null, "Greška prilikom izmene beleške.");
+                        ex.printStackTrace();
+                        return;
                     }
                 }
+                fetchData();
             }
         });
     }

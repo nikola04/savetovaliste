@@ -23,4 +23,8 @@ public class Test {
     public OblastTesta getOblast() {
         return oblast;
     }
+    @Override
+    public String toString() {
+        return naziv + " (" + cena + "RSD - " + oblast + ")";
+    }
 }

@@ -1,7 +1,7 @@
 package savetovaliste.controller.btnactions;
 
 import savetovaliste.gui.view.psihoterapeut.DugovanjeKlijenta;
-import savetovaliste.gui.view.psihoterapeut.SeansaInfoScreen;
+import savetovaliste.gui.view.psihoterapeut.SeansaScreen;
 import savetovaliste.gui.view.psihoterapeut.UplateKlijenta;
 
 import javax.swing.*;
@@ -46,8 +46,8 @@ public void actionPerformed(ActionEvent e) {
         DugovanjeKlijenta.getInstance(klijentSeansaId);
         DugovanjeKlijenta.getInstance(klijentSeansaId).setVisible(true);
     }else if(label.equals("Vise o Seansi")){
-        SeansaInfoScreen.getInstance(klijentSeansaId);
-        SeansaInfoScreen.getInstance(klijentSeansaId).setVisible(true);
+        SeansaScreen.getInstance(klijentSeansaId);
+        SeansaScreen.getInstance(klijentSeansaId).setVisible(true);
     }
     fireEditingStopped();
 }

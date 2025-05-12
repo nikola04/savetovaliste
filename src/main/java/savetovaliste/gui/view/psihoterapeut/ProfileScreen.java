@@ -100,6 +100,7 @@ public class ProfileScreen extends JPanel implements ISubscriber {
         gbc.gridy = row;
         gbc.weightx = 0.25;
         gbc.fill = GridBagConstraints.HORIZONTAL;
+        label.setFont(new Font("Arial", Font.BOLD, 14));
         panel.add(label, gbc);
 
         gbc.gridx = 1;

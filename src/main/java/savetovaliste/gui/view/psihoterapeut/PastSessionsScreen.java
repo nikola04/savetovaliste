@@ -11,6 +11,7 @@ import savetovaliste.model.Psihoterapeut;
 import savetovaliste.model.Seansa;
 
 import javax.swing.*;
+import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.sql.SQLException;
@@ -56,11 +57,9 @@ public class PastSessionsScreen extends JPanel implements ISubscriber {
         model.addColumn("Vise o Seansi");
 
         table = new JTable(model);
-        table.setBackground(Color.CYAN);
-
 
         JScrollPane scrollPane = new JScrollPane(table);
-        scrollPane.setBackground(Color.LIGHT_GRAY);
+        scrollPane.setBorder(new EmptyBorder(10, 10, 10, 10));
         add(Box.createVerticalStrut(10));
         add(scrollPane);
     }

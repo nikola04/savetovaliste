@@ -142,9 +142,7 @@ public class SignUpForm extends JFrame {
             Date selectedDate = (Date) datePicker.getModel().getValue();
             java.sql.Date mysqlDate = new java.sql.Date(selectedDate.getTime());
             int brojSertifikata = Integer.parseInt(txtbrojSertifikata.getText());
-
-            System.out.println(mysqlDate);
-
+            
             try {
                 int success = JDBCUtils.registerPsihoterapeut(ime,prezime,jmbg,email,telefon,mysqlDate,brojSertifikata,strukaId);
                 if(success == 0) {
@@ -164,6 +162,10 @@ public class SignUpForm extends JFrame {
                 }
                 if(success == -3) {
                     JOptionPane.showMessageDialog(null, "Broj sertifikata je vec registrovan.", "Broj sertifikata je vec registrovan", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+                if(success == -4) {
+                    JOptionPane.showMessageDialog(null, "Sertifikat sa datim ID-jem nije pronadjen ili nije povezan sa vasim JMBG.", "Sertifikat nije pronadjen", JOptionPane.ERROR_MESSAGE);
                     return;
                 }
                 JOptionPane.showMessageDialog(null, "Desila se greska prilikom unosa. Molimo vas pokusajte ponovo.", "Greska", JOptionPane.ERROR_MESSAGE);

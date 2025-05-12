@@ -4,21 +4,22 @@ import savetovaliste.db.utility.JDBCUtils;
 import savetovaliste.model.CenaSeanse;
 import savetovaliste.model.Klijent;
 import savetovaliste.model.Seansa;
-import savetovaliste.model.Test;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.sql.SQLException;
 
-public class SeansaInfoScreen extends JFrame {
-    private static SeansaInfoScreen instance;
+public class SeansaScreen extends JFrame {
+    private static SeansaScreen instance;
     private static int seansaId;
     private Seansa seansa;
 
+    private JFrame frameBeleske;
     private JFrame frameObjavljeniPodaci;
+    private JFrame frameTestiranja;
 
     private final JLabel lblSeansaId = new JLabel();
     private final JLabel lblPrva = new JLabel();
@@ -43,18 +44,18 @@ public class SeansaInfoScreen extends JFrame {
 
     private final JButton btnBeleske = new JButton("Pogledaj Beleske sa Seanse");
     private final JButton btnObjavljeniPodaci = new JButton("Objavljeni Podaci");
-    private final JButton btnTestovi = new JButton("Testovi Seanse");
+    private final JButton btnTestiranja = new JButton("Testiranja");
 
-    public static SeansaInfoScreen getInstance(int id){
+    public static SeansaScreen getInstance(int id){
         if(instance == null){
-            instance = new SeansaInfoScreen();
+            instance = new SeansaScreen();
         }
         seansaId = id;
         instance.fetchData();
         return instance;
     }
 
-    private SeansaInfoScreen() {
+    private SeansaScreen() {
         setTitle("Informacije o Seansi");
         setSize(700, 370);
         setLocationRelativeTo(null);
@@ -84,7 +85,7 @@ public class SeansaInfoScreen extends JFrame {
         row = addRow(leftPanel, gbcLeft, row, "Na rate:", lblNaRate);
         row = addRow(leftPanel, gbcLeft, row, "Plaćeno:", lblPlaceno);
         row = addRow(leftPanel, gbcLeft, row, "Cena Seanse:", lblCena);
-        row = addRow(leftPanel, gbcLeft, row, "Datum promene cene:", lblCenaDatum);
+        addRow(leftPanel, gbcLeft, row, "Datum promene cene:", lblCenaDatum);
 
         JPanel rightPanel = new JPanel(new GridBagLayout());
         GridBagConstraints gbcRight = new GridBagConstraints();
@@ -101,7 +102,7 @@ public class SeansaInfoScreen extends JFrame {
         rRow = addRow(rightPanel, gbcRight, rRow, "Email:", lblKlijentEmail);
         rRow = addRow(rightPanel, gbcRight, rRow, "Telefon:", lblKlijentTelefon);
         rRow = addRow(rightPanel, gbcRight, rRow, "Ranije terapije:", lblklijentRanijeTerapije);
-        rRow = addRow(rightPanel, gbcRight, rRow, "Broj prijave:", lblKlijentBrojPrijave);
+        addRow(rightPanel, gbcRight, rRow, "Broj prijave:", lblKlijentBrojPrijave);
 
         mainPanel.add(leftPanel);
         mainPanel.add(rightPanel);
@@ -110,14 +111,21 @@ public class SeansaInfoScreen extends JFrame {
         JPanel btnPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
         btnPanel.add(btnBeleske);
         btnPanel.add(btnObjavljeniPodaci);
-        btnPanel.add(btnTestovi);
+        btnPanel.add(btnTestiranja);
         add(btnPanel, BorderLayout.CENTER);
+
+        frameBeleske = new JFrame("Beleske sa Seanse");
+        frameBeleske.setSize(700, 380);
+        frameBeleske.setLayout(new BoxLayout(frameBeleske.getContentPane(), BoxLayout.Y_AXIS));
 
         frameObjavljeniPodaci = new JFrame("Objavljeni podaci");
         frameObjavljeniPodaci.setSize(700, 380);
         frameObjavljeniPodaci.setLayout(new BoxLayout(frameObjavljeniPodaci.getContentPane(), BoxLayout.Y_AXIS));
-    }
 
+        frameTestiranja = new JFrame("Testiranja");
+        frameTestiranja.setSize(700, 380);
+        frameTestiranja.setLayout(new BoxLayout(frameTestiranja.getContentPane(), BoxLayout.Y_AXIS));
+    }
 
     private int addRow(JPanel panel, GridBagConstraints gbc, int row, String labelText, JLabel valueLabel) {
         JLabel label = new JLabel(labelText);
@@ -160,7 +168,7 @@ public class SeansaInfoScreen extends JFrame {
         lblKlijentEmail.setText(k.getEmail());
         lblKlijentTelefon.setText(k.getTelefon());
         lblklijentRanijeTerapije.setText(k.isRanijeTerapije() ? "Da" : "Ne");
-        lblKlijentBrojPrijave.setText("N/A"); // Ako imas podatke, zameni
+        lblKlijentBrojPrijave.setText(k.getPrijava() != null ? String.valueOf(k.getPrijava().getId()) : "N/A"); // Ako imas podatke, zameni
 
         CenaSeanse cs = seansa.getCenaSeanse();
         lblCena.setText(cs.getCena() + " RSD");
@@ -169,15 +177,27 @@ public class SeansaInfoScreen extends JFrame {
 
     private void registerActions() {
         btnBeleske.addActionListener(_ -> {
-            BeleskeScreen.getInstance(seansa).setVisible(true);
+            frameBeleske.setContentPane(BeleskeScreen.getInstance(seansa));
+            frameBeleske.setVisible(true);
         });
 
         btnObjavljeniPodaci.addActionListener(_ -> {
             frameObjavljeniPodaci.setContentPane(ObjavljeniPodaci.getInstance(seansa));
             frameObjavljeniPodaci.setVisible(true);
         });
-        btnTestovi.addActionListener(_ -> {
-            TestScreen.getInstance().setVisible(true);
+        btnTestiranja.addActionListener(_ -> {
+            frameTestiranja.setContentPane(TestiranjaScreen.getInstance(seansa));
+            frameTestiranja.setVisible(true);
+        });
+        addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                frameObjavljeniPodaci.dispose();
+                frameTestiranja.dispose();
+                frameBeleske.dispose();
+                seansa = null;
+                super.windowClosing(e);
+            }
         });
     }
 }

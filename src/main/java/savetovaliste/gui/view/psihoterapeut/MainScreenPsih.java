@@ -66,7 +66,7 @@ public class MainScreenPsih extends JPanel implements ISubscriber {
 
         clientApplicationsFrame = new JFrame("Prijave klijenta");
         clientApplicationsFrame.setContentPane(ClientApplicScreen.getInstance());
-        clientApplicationsFrame.setSize(500, 320);
+        clientApplicationsFrame.setSize(800, 400);
 
         pastSessionsFrame = new JFrame("Odrzane Seanse");
         pastSessionsFrame.setContentPane(PastSessionsScreen.getInstance());
@@ -74,7 +74,7 @@ public class MainScreenPsih extends JPanel implements ISubscriber {
 
         upcomingSessionsFrame = new JFrame("Buduci termini");
         upcomingSessionsFrame.setContentPane(UpcSessionsScreen.getInstance());
-        upcomingSessionsFrame.setSize(500, 320);
+        upcomingSessionsFrame.setSize(900, 320);
 
         paymentsFrame = new JFrame("Uplate i dugovanja");
         paymentsFrame.setContentPane(PaymentsScreen.getInstance());
@@ -98,7 +98,6 @@ public class MainScreenPsih extends JPanel implements ISubscriber {
         add(headingPanel, BorderLayout.NORTH);
 
         JPanel mainPanel = new JPanel();
-        mainPanel.setBackground(Color.LIGHT_GRAY);
         mainPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 10, 10));
 
         addButton(mainPanel, btnShowProfile);

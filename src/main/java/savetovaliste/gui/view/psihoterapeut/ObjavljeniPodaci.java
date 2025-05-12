@@ -15,14 +15,12 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 
 public class ObjavljeniPodaci extends JPanel {
-    public static ObjavljeniPodaci instance;
+    private static ObjavljeniPodaci instance;
     private Seansa seansa;
 
-    private JLabel lblRazlog;
     private JComboBox<String> dropdownKome;
     private JTextField razlogField;
     private JButton objaviButton;
-    private JTable table;
     private DefaultTableModel tableModel;
 
     private ObjavljeniPodaci() {}
@@ -42,9 +40,9 @@ public class ObjavljeniPodaci extends JPanel {
 
         JPanel verticalPanel = new JPanel();
         verticalPanel.setLayout(new BoxLayout(verticalPanel, BoxLayout.Y_AXIS));
-        verticalPanel.setBorder(new EmptyBorder(30, 50, 50, 50)); // 30 top, 50 bottom & sides
+        verticalPanel.setBorder(new EmptyBorder(30, 50, 40, 50));
 
-        lblRazlog = new JLabel("Razlog:");
+        JLabel lblRazlog = new JLabel("Razlog:");
         razlogField = new JTextField(30);
         razlogField.setMaximumSize(new Dimension(Integer.MAX_VALUE, razlogField.getPreferredSize().height));
         lblRazlog.setLabelFor(razlogField);
@@ -73,7 +71,7 @@ public class ObjavljeniPodaci extends JPanel {
                 return false;
             }
         };
-        table = new JTable(tableModel);
+        JTable table = new JTable(tableModel);
 
         JScrollPane scrollPane = new JScrollPane(table);
         scrollPane.setBorder(new EmptyBorder(10, 10, 10, 10));
