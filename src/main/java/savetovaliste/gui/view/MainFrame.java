@@ -17,22 +17,21 @@ public class MainFrame extends JFrame implements ISubscriber {
         }
         return instance;
     }
-    private MainFrame(){}
+
+    private MainFrame(){
+    }
 
     public void update(Object value) {
         if(value instanceof Integer userId) {
             if (userId == -1) {
                 this.setContentPane(MainScreen.getInstance());
             } else this.setContentPane(MainScreenPsih.getInstance());
-
             this.revalidate();
             this.repaint();
         }
     }
 
-    public void initialize() {
-        Session.getInstance().addSubscriber(this);
-    }
+    public void initialize(){Session.getInstance().addSubscriber(this);}
 
     public void initializeGUI() {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);

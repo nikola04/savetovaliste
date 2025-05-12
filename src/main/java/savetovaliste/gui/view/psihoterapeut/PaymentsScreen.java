@@ -59,8 +59,10 @@ public class PaymentsScreen  extends JPanel implements ISubscriber {
         this.add(Box.createVerticalStrut(10));
 
         setTables();
-        klijentiTable.getColumn("Uplate").setCellRenderer(new BtnRenderer());
-        klijentiTable.getColumn("Dugovanja").setCellRenderer(new BtnRenderer());
+        klijentiTable.getColumn("Uplate").setPreferredWidth(70);
+        klijentiTable.getColumn("Dugovanja").setPreferredWidth(90);
+        klijentiTable.getColumn("Uplate").setCellRenderer(new BtnRenderer("Uplate"));
+        klijentiTable.getColumn("Dugovanja").setCellRenderer(new BtnRenderer("Dugovanja"));
         klijentiTable.getColumn("Uplate").setCellEditor(new BtnEditor(klijentiTable,"Uplate"));
         klijentiTable.getColumn("Dugovanja").setCellEditor(new BtnEditor(klijentiTable,"Dugovanja"));
     }

@@ -18,13 +18,13 @@ private JTable table;
 public BtnEditor(JTable table, String label) {
     this.table = table;
     this.button = new JButton();
+    button.setText(label);
     this.button.addActionListener(this);
     this.label = label;
 }
 
 @Override
-public Component getTableCellEditorComponent(JTable table, Object value,
-                                             boolean isSelected, int row, int column) {
+public Component getTableCellEditorComponent(JTable table, Object value,boolean isSelected, int row, int column) {
     button.setText(label);
     return button;
 }

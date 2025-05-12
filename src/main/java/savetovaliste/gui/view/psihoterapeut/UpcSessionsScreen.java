@@ -53,7 +53,7 @@ public class UpcSessionsScreen  extends JPanel implements ISubscriber {
         model.addColumn("Vise o Seansi");
 
         table = new JTable(model);
-
+        table.getColumn("Vise o Seansi").setMinWidth(150);
 
         JScrollPane scrollPane = new JScrollPane(table);
         add(Box.createVerticalStrut(10));
@@ -77,8 +77,7 @@ public class UpcSessionsScreen  extends JPanel implements ISubscriber {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-
-        table.getColumn("Vise o Seansi").setCellRenderer(new BtnRenderer());
+        table.getColumn("Vise o Seansi").setCellRenderer(new BtnRenderer("Vise o Seansi"));
         table.getColumn("Vise o Seansi").setCellEditor(new BtnEditor(table,"Vise o Seansi"));
     }
 
