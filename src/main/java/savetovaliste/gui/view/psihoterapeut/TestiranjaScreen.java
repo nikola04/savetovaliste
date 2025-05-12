@@ -131,9 +131,10 @@ public class TestiranjaScreen extends JPanel {
                 return;
             }
             Test test = (Test) dropdownTest.getSelectedItem();
-            double rezultat = ((double) spnRezultat.getValue()) / 100;
+            double rezultat = (double) ((int) spnRezultat.getValue()) / 100;
             try {
                 JDBCUtils.addTestiranje(test.getId(), rezultat, seansa.getId());
+                fetchData();
             } catch (SQLException ex) {
                 JOptionPane.showMessageDialog(this, "Greska prilikom dodavanja testiranja!", "Greska", JOptionPane.ERROR_MESSAGE);
                 ex.printStackTrace();

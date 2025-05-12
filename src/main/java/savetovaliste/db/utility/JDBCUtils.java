@@ -591,6 +591,12 @@ public class JDBCUtils {
     }
 
     public static void addTestiranje(int testId, double rezultat, int seansaId) throws SQLException{
-
+        String sql = "{CALL dodaj_testiranje(?, ?, ?)}";
+        PreparedStatement stmt = getConnection().prepareStatement(sql);
+        stmt.setDouble(1, rezultat);
+        stmt.setInt(2, testId);
+        stmt.setInt(3, seansaId);
+        stmt.executeUpdate();
+        stmt.close();
     }
 }
