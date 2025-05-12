@@ -7,10 +7,12 @@ import savetovaliste.model.*;
 import java.sql.*;
 import java.util.ArrayList;
 
+import static savetovaliste.db.DBUtil.getConnection;
+
 public class JDBCUtils {
     public static Psihoterapeut loginPsihoterapeut(String email, String jmbg) throws SQLException {
         String sql = "SELECT * FROM psihoterapeut WHERE email = ? AND jmbg = ?";
-        PreparedStatement stmt = DBUtil.getConnection().prepareStatement(sql);
+        PreparedStatement stmt = getConnection().prepareStatement(sql);
         stmt.setString(1, email);
         stmt.setString(2, jmbg);
 
@@ -35,7 +37,7 @@ public class JDBCUtils {
     }
     public static ArrayList<Psihoterapeut> getPsihoterapeuts() throws SQLException {
         String sql = "SELECT * FROM psihoterapeut";
-        Statement stmt = DBUtil.getConnection().createStatement();
+        Statement stmt = getConnection().createStatement();
         ResultSet rs = stmt.executeQuery(sql);
         ArrayList<Psihoterapeut> psihoterapeuti = new ArrayList<>();
         while (rs.next()) {
@@ -63,7 +65,7 @@ public class JDBCUtils {
                 "                INNER JOIN prijava as p ON p.prijava_id = k.prijava_id\n" +
                 "                WHERE p.psihoterapeut_id = ? AND (s.dan < CURRENT_DATE OR (s.dan = CURRENT_DATE AND ADDTIME(s.vreme, SEC_TO_TIME(s.vreme_trajanja * 60)) <= CURRENT_TIME))\n" +
                 "                ORDER BY s.dan, s.vreme;";
-        PreparedStatement stmt = DBUtil.getConnection().prepareStatement(sql);
+        PreparedStatement stmt = getConnection().prepareStatement(sql);
         stmt.setInt(1, psihoterapeut.getId());
         ResultSet rs = stmt.executeQuery();
 
@@ -110,7 +112,7 @@ public class JDBCUtils {
     }
     public static Klijent getKlijent(int klijentId) throws SQLException {
         String sql = "SELECT * FROM klijent WHERE klijent_id = ?";
-        PreparedStatement stmt = DBUtil.getConnection().prepareStatement(sql);
+        PreparedStatement stmt = getConnection().prepareStatement(sql);
         stmt.setInt(1, klijentId);
         ResultSet rs = stmt.executeQuery();
         Klijent klijent;
@@ -195,7 +197,7 @@ public class JDBCUtils {
                 "        DATE_ADD(s.dan, INTERVAL 30 DAY) < p2.datum\n" +
                 "    ))\n" +
                 ");";
-        PreparedStatement stmt = DBUtil.getConnection().prepareStatement(sql);
+        PreparedStatement stmt = getConnection().prepareStatement(sql);
         stmt.setInt(1, klijent.getId());
         stmt.setInt(2, klijent.getId());
         ResultSet rs = stmt.executeQuery();
@@ -218,7 +220,7 @@ public class JDBCUtils {
 
     public static ArrayList<Placanje> getPlacanja(Klijent klijent) throws SQLException {
         String sql = "SELECT p.placanje_id, iznos, iznos_sa_provizijom, valuta_valuta_id as valuta_id, v.pun_naziv as valuta, v.skraceni_naziv as valuta_s, datum as datum_placanja, nacin_placanja, svrha_placanja, rata, s.seansa_id as seansa, na_rate FROM placanje as p INNER JOIN seansa as s ON s.seansa_id = p.seansa_id INNER JOIN valuta as v ON p.valuta_valuta_id = v.valuta_id WHERE s.klijent_id = ?";
-        PreparedStatement stmt = DBUtil.getConnection().prepareStatement(sql);
+        PreparedStatement stmt = getConnection().prepareStatement(sql);
         stmt.setInt(1, klijent.getId());
         ResultSet rs = stmt.executeQuery();
         ArrayList<Placanje> placanja = new ArrayList<>();
@@ -250,7 +252,7 @@ public class JDBCUtils {
                 "JOIN prijava p ON k.prijava_id = p.prijava_id " +
                 "WHERE p.psihoterapeut_id = ?";
 
-        PreparedStatement stmt = DBUtil.getConnection().prepareStatement(sql);
+        PreparedStatement stmt = getConnection().prepareStatement(sql);
         stmt.setInt(1, Session.getInstance().getPsihoterapeut().getId());
         ResultSet rs = stmt.executeQuery();
         ArrayList<Klijent> klijenti = new ArrayList<>();
@@ -277,7 +279,7 @@ public class JDBCUtils {
                 "                INNER JOIN prijava as p ON p.prijava_id = k.prijava_id " +
                 "                WHERE p.psihoterapeut_id = ? AND s.dan > CURRENT_DATE OR (s.dan = CURRENT_DATE AND ADDTIME(s.vreme, SEC_TO_TIME(s.vreme_trajanja * 60)) > CURRENT_TIME) " +
                 "                ORDER BY s.dan, s.vreme;";
-        PreparedStatement stmt = DBUtil.getConnection().prepareStatement(sql);
+        PreparedStatement stmt = getConnection().prepareStatement(sql);
         stmt.setInt(1, psihoterapeut.getId());
         ResultSet rs = stmt.executeQuery();
 
@@ -327,7 +329,7 @@ public class JDBCUtils {
                 "INNER JOIN klijent k ON s.klijent_id = k.klijent_id\n" +
                 "INNER JOIN cena_seanse c ON s.cena_seanse_id = c.cena_seanse_id\n" +
                 "WHERE s.seansa_id =?;\n";
-        PreparedStatement stmt = DBUtil.getConnection().prepareStatement(sql);
+        PreparedStatement stmt = getConnection().prepareStatement(sql);
         stmt.setInt(1, seansaId);
         ResultSet rs = stmt.executeQuery();
         Seansa seansa = null;
@@ -366,7 +368,7 @@ public class JDBCUtils {
 
     public static ArrayList<Struka> getStruke() throws SQLException {
         String sql = "SELECT * FROM struka";
-        Statement stmt = DBUtil.getConnection().createStatement();
+        Statement stmt = getConnection().createStatement();
         ResultSet rs = stmt.executeQuery(sql);
 
         ArrayList<Struka> struke = new ArrayList<>();
@@ -383,7 +385,7 @@ public class JDBCUtils {
 
     public static Sertifikat getSertifikat(int sertifikatId) throws SQLException {
         String sql = "SELECT datum_sertifikata, sertifikat.oblasti_id as oblast_id, naziv as oblast_naziv FROM sertifikat INNER JOIN oblasti_psihoterapije ON oblasti_psihoterapije.oblasti_id = sertifikat.oblasti_id WHERE sertifikat_id = ?";
-        PreparedStatement stmt = DBUtil.getConnection().prepareStatement(sql);
+        PreparedStatement stmt = getConnection().prepareStatement(sql);
         stmt.setInt(1, sertifikatId);
         ResultSet rs = stmt.executeQuery();
 
@@ -402,7 +404,7 @@ public class JDBCUtils {
     public static ArrayList<Prijava> getPsihoterapeutPrijave(Psihoterapeut psihoterapeut) throws SQLException {
         ArrayList<Prijava> prijave = new ArrayList<>();
         String sql = "SELECT prijava.prijava_id as prijava_id, klijent_id, ime, prezime, datum_rodjenja, pol, email, broj, ranije_terapije FROM klijent INNER JOIN prijava ON prijava.prijava_id = klijent.prijava_id WHERE prijava.psihoterapeut_id = ?";
-        PreparedStatement stmt = DBUtil.getConnection().prepareStatement(sql);
+        PreparedStatement stmt = getConnection().prepareStatement(sql);
         stmt.setInt(1, psihoterapeut.getId());
         ResultSet rs = stmt.executeQuery();
 
@@ -432,7 +434,7 @@ public class JDBCUtils {
     public static int registerPsihoterapeut(String ime, String prezime, String jmbg, String email, String telefon, Date mysqlDate, int brojSertifikata, int strukaId) throws SQLException{
         try {
             String sql = "{CALL dodaj_psihoterapeuta(?, ?, ?, ?, ?, ?, ?, ?)}";
-            CallableStatement stmt = DBUtil.getConnection().prepareCall(sql);
+            CallableStatement stmt = getConnection().prepareCall(sql);
             stmt.setString(1, ime);
             stmt.setString(2, prezime);
             stmt.setString(3, jmbg);
@@ -458,7 +460,7 @@ public class JDBCUtils {
 
     public static ArrayList<Beleske> getBeleske(Seansa seansa) throws SQLException {
         String sql = "SELECT beleske_id, tekst  FROM beleske WHERE seansa_id = ?";
-        PreparedStatement stmt = DBUtil.getConnection().prepareStatement(sql);
+        PreparedStatement stmt = getConnection().prepareStatement(sql);
         stmt.setInt(1, seansa.getId());
         ResultSet rs = stmt.executeQuery();
         ArrayList<Beleske> beleskeList = new ArrayList<Beleske>();
@@ -478,7 +480,7 @@ public class JDBCUtils {
                 "INNER JOIN test as te ON te.test_id = t.test_id\n" +
                 "INNER JOIN oblast_test as ot ON ot.oblast_testa_id = te.oblast_testa_id\n" +
                 "WHERE t.seansa_id = ?;";
-        PreparedStatement stmt = DBUtil.getConnection().prepareStatement(sql);
+        PreparedStatement stmt = getConnection().prepareStatement(sql);
         stmt.setInt(1, seansa.getId());
         ResultSet rs = stmt.executeQuery();
         ArrayList<Testiranje> testiranja = new ArrayList<>();
@@ -501,7 +503,7 @@ public class JDBCUtils {
 
     public static ArrayList<ObjavljeniPodatak> getObjavljeniPodaci(Seansa seansa) throws SQLException {
         String sql = "SELECT objavljivanje_id, razlog, kome, datum_objave FROM `objavljivanje_podataka` WHERE seansa_id = ?;";
-        PreparedStatement stmt = DBUtil.getConnection().prepareStatement(sql);
+        PreparedStatement stmt = getConnection().prepareStatement(sql);
         stmt.setInt(1, seansa.getId());
         ResultSet rs = stmt.executeQuery();
 
@@ -520,12 +522,43 @@ public class JDBCUtils {
 
     public static void objaviPodatake(int seansaId, String razlog, String kome,  Date date) throws SQLException {
         String sql = "{CALL dodaj_objavljivanje(?, ?, ?, ?)}";
-        PreparedStatement stmt = DBUtil.getConnection().prepareStatement(sql);
+        PreparedStatement stmt = getConnection().prepareStatement(sql);
         stmt.setInt(1, seansaId);
         stmt.setString(2, kome.toLowerCase().trim());
         stmt.setString(3, razlog);
         stmt.setDate(4, date);
         stmt.execute();
+        stmt.close();
+    }
+
+    public static void updateBeleska(int beleskaId, String noviTekst) throws SQLException {
+        String sql = "{CALL update_beleska(?, ?)}";
+        PreparedStatement stmt = getConnection().prepareStatement(sql);
+        stmt.setInt(1, beleskaId);
+        stmt.setString(2, noviTekst);
+        stmt.executeUpdate();
+        stmt.close();
+    }
+
+    public static Beleske getBeleskeById(int beleskaId) throws SQLException {
+       return null;
+    }
+
+    public static void removeBeleske(int beleskaId) throws SQLException{
+        String sql = "{CALL delete_beleska(?)}";
+        PreparedStatement stmt = getConnection().prepareStatement(sql);
+        stmt.setInt(1, beleskaId);
+        stmt.executeUpdate();
+        stmt.close();
+
+    }
+
+    public static void addBeleske(String newText, int seansa_id) throws SQLException{
+        String sql = "{CALL insert_beleska(?, ?)}";
+        PreparedStatement stmt = getConnection().prepareStatement(sql);
+        stmt.setInt(1, seansa_id);
+        stmt.setString(2, newText);
+        stmt.executeUpdate();
         stmt.close();
     }
 }
