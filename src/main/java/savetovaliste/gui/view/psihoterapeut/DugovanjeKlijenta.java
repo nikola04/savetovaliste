@@ -6,20 +6,15 @@ import savetovaliste.model.*;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
-import java.awt.*;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
 public class DugovanjeKlijenta extends JFrame {
     private static DugovanjeKlijenta instance;
-    private JPanel contentPane;
-    private JLabel lblDugovanje;
     private int klijent_id;
-    private Klijent klijent;
     private ArrayList<Neplaceno> neplaceno = new ArrayList<>();
 
     private JTable table;
-    private JScrollPane scrollPane;
     private DefaultTableModel tableModel;
 
     private DugovanjeKlijenta() {
@@ -38,7 +33,7 @@ public class DugovanjeKlijenta extends JFrame {
 
     private void fetchData() {
         try {
-            klijent = JDBCUtils.getKlijent(klijent_id);
+            Klijent klijent = JDBCUtils.getKlijent(klijent_id);
             if(klijent == null) return;
             neplaceno = JDBCUtils.getNeplaceno(klijent);
             this.updateTable();
@@ -49,14 +44,15 @@ public class DugovanjeKlijenta extends JFrame {
 
     private void initialize() {
         this.setSize(500,380);
-        contentPane = new JPanel();
+        JPanel contentPane = new JPanel();
         contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
         setContentPane(contentPane);
-        lblDugovanje = new JLabel("Dugovanja Klijenta");
+        JLabel lblDugovanje = new JLabel("Dugovanja Klijenta");
         contentPane.add(lblDugovanje);
 
         table = new JTable();
-        scrollPane = new JScrollPane(table);
+        JScrollPane scrollPane = new JScrollPane(table);
+        scrollPane.setBorder(new EmptyBorder(10, 20, 10, 20));
         tableModel = new DefaultTableModel();
 
         tableModel.addColumn("ID");
@@ -73,7 +69,7 @@ public class DugovanjeKlijenta extends JFrame {
     private void updateTable(){
         tableModel.setRowCount(0);
         for(Neplaceno n : neplaceno) {
-            String rate = "";
+            String rate;
             if(n.isNaRate() && n.isIstekaoRok())
                 rate = "Istekao rok";
             else if (!n.isNaRate()) {

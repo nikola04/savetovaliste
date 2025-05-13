@@ -6,24 +6,17 @@ import savetovaliste.controller.btnactions.BtnRenderer;
 import savetovaliste.controller.observer.ISubscriber;
 import savetovaliste.db.utility.JDBCUtils;
 import savetovaliste.model.Klijent;
-import savetovaliste.model.Prijava;
 
 import javax.swing.*;
-import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableColumn;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
 public class PaymentsScreen  extends JPanel implements ISubscriber {
     private static PaymentsScreen instance;
-    private JLabel lblHeading;
     private JTable klijentiTable;
-    private JScrollPane scrollPane;
     private DefaultTableModel modelKlijenti;
-
-    private JFrame frameUplateKlijenta;
-    private JFrame frameDugovanjeKlijenta;
 
     public static PaymentsScreen getInstance(){
         if(instance == null) {
@@ -35,9 +28,10 @@ public class PaymentsScreen  extends JPanel implements ISubscriber {
 
     private void initialize() {
         Session.getInstance().addSubscriber(this);
-        lblHeading = new JLabel("Uplate i Dugovanja Klijenata");
+        JLabel lblHeading = new JLabel("Uplate i Dugovanja Klijenata");
         klijentiTable = new JTable();
-        scrollPane = new JScrollPane(klijentiTable);
+        JScrollPane scrollPane = new JScrollPane(klijentiTable);
+        scrollPane.setBorder(new EmptyBorder(10, 20, 10, 20));
         modelKlijenti = new DefaultTableModel();
 
         modelKlijenti.addColumn("ID Klijenta");
@@ -53,6 +47,7 @@ public class PaymentsScreen  extends JPanel implements ISubscriber {
 
         this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
         this.setAlignmentX(CENTER_ALIGNMENT);
+        this.add(Box.createVerticalStrut(10));
         this.add(lblHeading);
         this.add(Box.createVerticalStrut(10));
         this.add(scrollPane);

@@ -1,7 +1,6 @@
 package savetovaliste.db.utility;
 
 import savetovaliste.Session;
-import savetovaliste.db.DBUtil;
 import savetovaliste.model.*;
 
 import java.sql.*;
@@ -59,12 +58,13 @@ public class JDBCUtils {
     }
 
     public static ArrayList<Seansa> getOdrzaneSeanse(Psihoterapeut psihoterapeut) throws SQLException {
-        String sql = "SELECT s.*, k.*, p.*, cena_seanse.cena, cena_seanse.datum_promene as datum_promene_cene\n" +
-                "                FROM seansa as s INNER JOIN cena_seanse ON cena_seanse.cena_seanse_id = s.cena_seanse_id\n" +
-                "                INNER JOIN klijent as k ON k.klijent_id = s.klijent_id\n" +
-                "                INNER JOIN prijava as p ON p.prijava_id = k.prijava_id\n" +
-                "                WHERE p.psihoterapeut_id = ? AND (s.dan < CURRENT_DATE OR (s.dan = CURRENT_DATE AND ADDTIME(s.vreme, SEC_TO_TIME(s.vreme_trajanja * 60)) <= CURRENT_TIME))\n" +
-                "                ORDER BY s.dan, s.vreme;";
+        String sql = """
+                SELECT s.*, k.*, p.*, cena_seanse.cena, cena_seanse.datum_promene as datum_promene_cene
+                                FROM seansa as s INNER JOIN cena_seanse ON cena_seanse.cena_seanse_id = s.cena_seanse_id
+                                INNER JOIN klijent as k ON k.klijent_id = s.klijent_id
+                                INNER JOIN prijava as p ON p.prijava_id = k.prijava_id
+                                WHERE p.psihoterapeut_id = ? AND (s.dan < CURRENT_DATE OR (s.dan = CURRENT_DATE AND ADDTIME(s.vreme, SEC_TO_TIME(s.vreme_trajanja * 60)) <= CURRENT_TIME))
+                                ORDER BY s.dan, s.vreme;""";
         PreparedStatement stmt = getConnection().prepareStatement(sql);
         stmt.setInt(1, psihoterapeut.getId());
         ResultSet rs = stmt.executeQuery();
@@ -138,65 +138,66 @@ public class JDBCUtils {
     }
 
     public static ArrayList<Neplaceno> getNeplaceno(Klijent klijent) throws SQLException {
-        String sql = "SELECT testiranje_id as id, 'testiranje' as tip, te.cena as iznos, FALSE as na_rate, FALSE as placeno, te.cena as nedostaje, FALSE as istekao_rok\n" +
-                "FROM testiranje AS t INNER JOIN test as te ON te.test_id = t.test_id \n" +
-                "INNER JOIN seansa AS s ON t.seansa_id = s.seansa_id\n" +
-                "WHERE t.placanje_id IS NULL AND s.klijent_id = ? \n" +
-                "\n" +
-                "UNION\n" +
-                "\n" +
-                "SELECT \n" +
-                "    s.seansa_id as id, 'seansa' as tip, cs.cena as iznos, \n" +
-                "    s.na_rate as na_rate,\n" +
-                "    CASE\n" +
-                "    \tWHEN s.na_rate = 1 AND (p1.iznos * k1.kurs_din + p2.iznos * k2.kurs_din) >= cs.cena\n" +
-                "        THEN TRUE\n" +
-                "        ELSE FALSE\n" +
-                "    END as placeno,\n" +
-                "    CASE\n" +
-                "    \tWHEN (p1.iznos * k1.kurs_din + p2.iznos * k2.kurs_din) >= cs.cena\n" +
-                "        THEN 0\n" +
-                "        ELSE (cs.cena - COALESCE(p1.iznos * k1.kurs_din + p2.iznos * k2.kurs_din, 0))\n" +
-                "    END as nedostaje,\n" +
-                "    CASE \n" +
-                "        WHEN s.na_rate = 1 AND (\n" +
-                "            (p2.placanje_id IS NULL AND DATE_ADD(s.dan, INTERVAL 30 DAY) < CURRENT_DATE)\n" +
-                "            OR\n" +
-                "            (p2.placanje_id IS NOT NULL AND DATE_ADD(s.dan, INTERVAL 30 DAY) < p2.datum))\n" +
-                "        THEN TRUE\n" +
-                "        ELSE FALSE\n" +
-                "    END as istekao_rok\n" +
-                "FROM seansa s\n" +
-                "LEFT JOIN placanje p1 ON p1.seansa_id = s.seansa_id AND p1.rata = 1\n" +
-                "LEFT JOIN placanje p2 ON p2.seansa_id = s.seansa_id AND p2.rata = 2\n" +
-                "\n" +
-                "LEFT JOIN kurs_valute k1 ON k1.valuta_id = p1.valuta_valuta_id AND k1.datum = (\n" +
-                "    SELECT MAX(datum) FROM kurs_valute\n" +
-                "    WHERE valuta_id = p1.valuta_valuta_id AND datum <= p1.datum\n" +
-                ")\n" +
-                "LEFT JOIN kurs_valute k2 ON k2.valuta_id = p2.valuta_valuta_id AND k2.datum = (\n" +
-                "    SELECT MAX(datum) FROM kurs_valute\n" +
-                "    WHERE valuta_id = p2.valuta_valuta_id AND datum <= p2.datum\n" +
-                ")\n" +
-                "\n" +
-                "INNER JOIN cena_seanse cs ON cs.cena_seanse_id = s.cena_seanse_id\n" +
-                "WHERE s.klijent_id = ? AND (\n" +
-                "    (s.na_rate = 0 AND NOT EXISTS(\n" +
-                "        SELECT 1 FROM placanje as p WHERE p.seansa_id = s.seansa_id\n" +
-                "    ))\n" +
-                "    OR\n" +
-                "    (s.na_rate = 1 AND (\n" +
-                "        p1.placanje_id IS NULL\n" +
-                "        OR\n" +
-                "        p1.iznos * k1.kurs_din < 0.3 * cs.cena\n" +
-                "        OR\n" +
-                "        p2.placanje_id IS NULL\n" +
-                "        OR\n" +
-                "        (p1.iznos * k1.kurs_din + p2.iznos * k2.kurs_din) < cs.cena\n" +
-                "        OR\n" +
-                "        DATE_ADD(s.dan, INTERVAL 30 DAY) < p2.datum\n" +
-                "    ))\n" +
-                ");";
+        String sql = """
+                SELECT testiranje_id as id, 'testiranje' as tip, te.cena as iznos, FALSE as na_rate, FALSE as placeno, te.cena as nedostaje, FALSE as istekao_rok
+                FROM testiranje AS t INNER JOIN test as te ON te.test_id = t.test_id\s
+                INNER JOIN seansa AS s ON t.seansa_id = s.seansa_id
+                WHERE t.placanje_id IS NULL AND s.klijent_id = ?\s
+                
+                UNION
+                
+                SELECT\s
+                    s.seansa_id as id, 'seansa' as tip, cs.cena as iznos,\s
+                    s.na_rate as na_rate,
+                    CASE
+                    \tWHEN s.na_rate = 1 AND (COALESCE(p1.iznos * k1.kurs_din, 0) + COALESCE(p1.iznos * k2.kurs_din, 0)) >= cs.cena
+                        THEN TRUE
+                        ELSE FALSE
+                    END as placeno,
+                    CASE
+                    \tWHEN (COALESCE(p1.iznos * k1.kurs_din, 0) + COALESCE(p1.iznos * k2.kurs_din, 0)) >= cs.cena
+                        THEN 0
+                        ELSE (cs.cena - COALESCE(p1.iznos * k1.kurs_din, 0) - COALESCE(p1.iznos * k2.kurs_din, 0))
+                    END as nedostaje,
+                    CASE\s
+                        WHEN s.na_rate = 1 AND (
+                            (p2.placanje_id IS NULL AND DATE_ADD(s.dan, INTERVAL 30 DAY) < CURRENT_DATE)
+                            OR
+                            (p2.placanje_id IS NOT NULL AND DATE_ADD(s.dan, INTERVAL 30 DAY) < p2.datum))
+                        THEN TRUE
+                        ELSE FALSE
+                    END as istekao_rok
+                FROM seansa s
+                LEFT JOIN placanje p1 ON p1.seansa_id = s.seansa_id AND p1.rata = 1
+                LEFT JOIN placanje p2 ON p2.seansa_id = s.seansa_id AND p2.rata = 2
+                
+                LEFT JOIN kurs_valute k1 ON k1.valuta_id = p1.valuta_valuta_id AND k1.datum = (
+                    SELECT MAX(datum) FROM kurs_valute
+                    WHERE valuta_id = p1.valuta_valuta_id AND datum <= p1.datum
+                )
+                LEFT JOIN kurs_valute k2 ON k2.valuta_id = p2.valuta_valuta_id AND k2.datum = (
+                    SELECT MAX(datum) FROM kurs_valute
+                    WHERE valuta_id = p2.valuta_valuta_id AND datum <= p2.datum
+                )
+                
+                INNER JOIN cena_seanse cs ON cs.cena_seanse_id = s.cena_seanse_id
+                WHERE s.klijent_id = ? AND s.prva != 1 AND (
+                    (s.na_rate = 0 AND NOT EXISTS(
+                        SELECT 1 FROM placanje as p WHERE p.seansa_id = s.seansa_id
+                    ))
+                    OR
+                    (s.na_rate = 1 AND (
+                        p1.placanje_id IS NULL
+                        OR
+                        p1.iznos * k1.kurs_din < 0.3 * cs.cena
+                        OR
+                        p2.placanje_id IS NULL
+                        OR
+                        (p1.iznos * k1.kurs_din + p2.iznos * k2.kurs_din) < cs.cena
+                        OR
+                        DATE_ADD(s.dan, INTERVAL 30 DAY) < p2.datum
+                    ))
+                );""";
         PreparedStatement stmt = getConnection().prepareStatement(sql);
         stmt.setInt(1, klijent.getId());
         stmt.setInt(2, klijent.getId());
@@ -324,11 +325,13 @@ public class JDBCUtils {
         return seanse;
     }
     public static Seansa getSeansa(int seansaId) throws SQLException {
-        String sql = "SELECT *\n" +
-                "FROM seansa s\n" +
-                "INNER JOIN klijent k ON s.klijent_id = k.klijent_id\n" +
-                "INNER JOIN cena_seanse c ON s.cena_seanse_id = c.cena_seanse_id\n" +
-                "WHERE s.seansa_id =?;\n";
+        String sql = """
+                SELECT *
+                FROM seansa s
+                INNER JOIN klijent k ON s.klijent_id = k.klijent_id
+                INNER JOIN cena_seanse c ON s.cena_seanse_id = c.cena_seanse_id
+                WHERE s.seansa_id =?;
+                """;
         PreparedStatement stmt = getConnection().prepareStatement(sql);
         stmt.setInt(1, seansaId);
         ResultSet rs = stmt.executeQuery();
@@ -468,7 +471,7 @@ public class JDBCUtils {
         PreparedStatement stmt = getConnection().prepareStatement(sql);
         stmt.setInt(1, seansa.getId());
         ResultSet rs = stmt.executeQuery();
-        ArrayList<Beleske> beleskeList = new ArrayList<Beleske>();
+        ArrayList<Beleske> beleskeList = new ArrayList<>();
         while (rs.next()) {
             int id = rs.getInt("beleske_id");
             String tekst = rs.getString("tekst");
@@ -480,15 +483,16 @@ public class JDBCUtils {
     }
 
     public static ArrayList<Testiranje> getTestiranja(Seansa seansa) throws SQLException {
-        String sql = "SELECT t.testiranje_id, t.rezultat, t.test_id, te.naziv, te.cena, te.oblast_testa_id as oblast_id, ot.naziv as oblast, CASE \n" +
-                "\tWHEN t.placanje_id IS NOT NULL\n" +
-                "    THEN TRUE\n" +
-                "    ELSE FALSE\n" +
-                "END as placeno\n" +
-                "FROM testiranje as t\n" +
-                "INNER JOIN test as te ON te.test_id = t.test_id\n" +
-                "INNER JOIN oblast_test as ot ON ot.oblast_testa_id = te.oblast_testa_id\n" +
-                "WHERE t.seansa_id = ?;";
+        String sql = """
+                SELECT t.testiranje_id, t.rezultat, t.test_id, te.naziv, te.cena, te.oblast_testa_id as oblast_id, ot.naziv as oblast, CASE 
+                WHEN t.placanje_id IS NOT NULL
+                    THEN TRUE
+                    ELSE FALSE
+                END as placeno
+                FROM testiranje as t
+                INNER JOIN test as te ON te.test_id = t.test_id
+                INNER JOIN oblast_test as ot ON ot.oblast_testa_id = te.oblast_testa_id
+                WHERE t.seansa_id = ?;""";
         PreparedStatement stmt = getConnection().prepareStatement(sql);
         stmt.setInt(1, seansa.getId());
         ResultSet rs = stmt.executeQuery();

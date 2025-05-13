@@ -11,9 +11,9 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 public class BtnEditor extends AbstractCellEditor implements TableCellEditor , ActionListener {
-private JButton button;
-private String label;
-private JTable table;
+private final JButton button;
+private final String label;
+private final JTable table;
 
 public BtnEditor(JTable table, String label) {
     this.table = table;
@@ -38,16 +38,19 @@ public Object getCellEditorValue() {
 public void actionPerformed(ActionEvent e) {
     int row = table.getSelectedRow();
     int klijentSeansaId = (int) table.getValueAt(row, 0);
-    if (label.equals("Uplate")) {
-        UplateKlijenta.getInstance(klijentSeansaId);
-        UplateKlijenta.getInstance(klijentSeansaId).setVisible(true);
-
-    } else if (label.equals("Dugovanja")) {
-        DugovanjeKlijenta.getInstance(klijentSeansaId);
-        DugovanjeKlijenta.getInstance(klijentSeansaId).setVisible(true);
-    }else if(label.equals("Vise o Seansi")){
-        SeansaScreen.getInstance(klijentSeansaId);
-        SeansaScreen.getInstance(klijentSeansaId).setVisible(true);
+    switch (label) {
+        case "Uplate" -> {
+            UplateKlijenta.getInstance(klijentSeansaId);
+            UplateKlijenta.getInstance(klijentSeansaId).setVisible(true);
+        }
+        case "Dugovanja" -> {
+            DugovanjeKlijenta.getInstance(klijentSeansaId);
+            DugovanjeKlijenta.getInstance(klijentSeansaId).setVisible(true);
+        }
+        case "Vise" -> {
+            SeansaScreen.getInstance(klijentSeansaId);
+            SeansaScreen.getInstance(klijentSeansaId).setVisible(true);
+        }
     }
     fireEditingStopped();
 }

@@ -12,7 +12,6 @@ import savetovaliste.model.Seansa;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
-import java.awt.*;
 import java.sql.SQLException;
 
 public class UpcSessionsScreen  extends JPanel implements ISubscriber {
@@ -32,30 +31,14 @@ public class UpcSessionsScreen  extends JPanel implements ISubscriber {
 
     private void initialize() {
         Session.getInstance().addSubscriber(this);
-
-        model = new DefaultTableModel();
     }
 
     private void initializeGUI() {
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
-        model.addColumn("ID");
-        model.addColumn("Datum");
-        model.addColumn("Vreme");
-        model.addColumn("Trajanje");
-        model.addColumn("Placeno");
-        model.addColumn("Klijent ID");
-        model.addColumn("Ime");
-        model.addColumn("Prezime");
-        model.addColumn("Email");
-        model.addColumn("Telefon");
-        model.addColumn("Pol");
-        model.addColumn("Datum Rodjenja");
-        model.addColumn("Ranije terapije");
-        model.addColumn("Vise o Seansi");
-
+        model = new DefaultTableModel(new Object[] { "ID", "Datum", "Vreme", "Trajanje", "Placeno", "Klijent ID", "Ime", "Prezime", "Email", "Telefon", "Pol", "Datum Rodjenja", "Ranije terapije", "Seansa"}, 0);
         table = new JTable(model);
-        table.getColumn("Vise o Seansi").setMinWidth(150);
+        table.getColumn("Seansa").setMinWidth(150);
 
         JScrollPane scrollPane = new JScrollPane(table);
         scrollPane.setBorder(new EmptyBorder(10, 10, 10, 10));
@@ -80,8 +63,8 @@ public class UpcSessionsScreen  extends JPanel implements ISubscriber {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        table.getColumn("Vise o Seansi").setCellRenderer(new BtnRenderer("Vise o Seansi"));
-        table.getColumn("Vise o Seansi").setCellEditor(new BtnEditor(table,"Vise o Seansi"));
+        table.getColumn("Seansa").setCellRenderer(new BtnRenderer("Vise"));
+        table.getColumn("Seansa").setCellEditor(new BtnEditor(table,"Vise"));
     }
 
     @Override

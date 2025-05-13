@@ -6,14 +6,12 @@ import savetovaliste.controller.btnactions.BtnRenderer;
 import savetovaliste.controller.observer.ISubscriber;
 import savetovaliste.db.utility.JDBCUtils;
 import savetovaliste.model.Klijent;
-import savetovaliste.model.Prijava;
 import savetovaliste.model.Psihoterapeut;
 import savetovaliste.model.Seansa;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
-import java.awt.*;
 import java.sql.SQLException;
 
 public class PastSessionsScreen extends JPanel implements ISubscriber {
@@ -33,29 +31,12 @@ public class PastSessionsScreen extends JPanel implements ISubscriber {
 
     private void initialize() {
         Session.getInstance().addSubscriber(this);
-
-        model = new DefaultTableModel();
-
     }
 
     private void initializeGUI() {
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
-        model.addColumn("ID");
-        model.addColumn("Datum");
-        model.addColumn("Vreme");
-        model.addColumn("Trajanje");
-        model.addColumn("Placeno");
-        model.addColumn("Klijent ID");
-        model.addColumn("Ime");
-        model.addColumn("Prezime");
-        model.addColumn("Email");
-        model.addColumn("Telefon");
-        model.addColumn("Pol");
-        model.addColumn("Datum Rodjenja");
-        model.addColumn("Ranije terapije");
-        model.addColumn("Vise o Seansi");
-
+        model = new DefaultTableModel(new Object[] { "ID", "Datum", "Vreme", "Trajanje", "Placeno", "Klijent ID", "Ime", "Prezime", "Email", "Telefon", "Pol", "Datum Rodjenja", "Ranije terapije", "Seansa"}, 0);
         table = new JTable(model);
 
         JScrollPane scrollPane = new JScrollPane(table);
@@ -81,10 +62,10 @@ public class PastSessionsScreen extends JPanel implements ISubscriber {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        table.getColumn("Vise o Seansi").setMinWidth(150);
-        table.getColumn("Vise o Seansi").setPreferredWidth(150);
-        table.getColumn("Vise o Seansi").setCellRenderer(new BtnRenderer("Vise o Seansi"));
-        table.getColumn("Vise o Seansi").setCellEditor(new BtnEditor(table,"Vise o Seansi"));
+        table.getColumn("Seansa").setMinWidth(150);
+        table.getColumn("Seansa").setPreferredWidth(150);
+        table.getColumn("Seansa").setCellRenderer(new BtnRenderer("Vise"));
+        table.getColumn("Seansa").setCellEditor(new BtnEditor(table,"Vise"));
     }
 
     @Override

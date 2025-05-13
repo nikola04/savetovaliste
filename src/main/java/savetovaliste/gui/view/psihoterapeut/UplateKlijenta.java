@@ -1,6 +1,5 @@
 package savetovaliste.gui.view.psihoterapeut;
 
-import savetovaliste.db.DBUtil;
 import savetovaliste.db.utility.JDBCUtils;
 import savetovaliste.model.Klijent;
 import savetovaliste.model.NacinPlacanja;
@@ -15,14 +14,10 @@ import java.util.ArrayList;
 
 public class UplateKlijenta extends JFrame {
     private static UplateKlijenta instance;
-    private JPanel contentPane;
-    private JLabel lblUplate;
     private int klijent_id;
-    private Klijent klijent;
     private ArrayList<Placanje> placanja = new ArrayList<>();
 
     private JTable table;
-    private JScrollPane scrollPane;
     private DefaultTableModel tableModel;
 
     private UplateKlijenta() {
@@ -40,7 +35,7 @@ public class UplateKlijenta extends JFrame {
 
     private void fetchData() {
         try {
-            klijent = JDBCUtils.getKlijent(klijent_id);
+            Klijent klijent = JDBCUtils.getKlijent(klijent_id);
             if(klijent == null) return;
             placanja = JDBCUtils.getPlacanja(klijent);
             this.updateTable();
@@ -52,14 +47,15 @@ public class UplateKlijenta extends JFrame {
     private void initialize() {
         this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
         this.setSize(500,380);
-        contentPane = new JPanel();
+        JPanel contentPane = new JPanel();
         contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
         setContentPane(contentPane);
-        lblUplate = new JLabel("Uplate Klijenta");
+        JLabel lblUplate = new JLabel("Uplate Klijenta");
         contentPane.add(lblUplate);
 
         table = new JTable();
-        scrollPane = new JScrollPane(table);
+        JScrollPane scrollPane = new JScrollPane(table);
+        scrollPane.setBorder(new EmptyBorder(10, 20, 10, 20));
 
         tableModel = new DefaultTableModel();
         tableModel.addColumn("ID");
