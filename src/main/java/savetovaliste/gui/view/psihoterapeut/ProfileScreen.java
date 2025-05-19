@@ -2,8 +2,10 @@ package savetovaliste.gui.view.psihoterapeut;
 
 import savetovaliste.Session;
 import savetovaliste.controller.observer.ISubscriber;
+import savetovaliste.model.Kandidat;
 import savetovaliste.model.Psihoterapeut;
 import savetovaliste.model.Sertifikat;
+import savetovaliste.model.SertifikovaniPsihoterapeut;
 
 import javax.swing.*;
 import java.awt.*;
@@ -118,9 +120,14 @@ public class ProfileScreen extends JPanel implements ISubscriber {
         lblTelefonValue.setText(psihoterapeut.getTelefon());
         lblDatumRodjenjaValue.setText(psihoterapeut.getDatumRodjenja().toString());
 
-        Sertifikat sertifikat = psihoterapeut.getSertifikat();
-        lblSertifikatValue.setText(sertifikat.getDatum().toString());
-        lblSertifikatOblastValue.setText(sertifikat.getOblast().toString());
+        if(psihoterapeut instanceof SertifikovaniPsihoterapeut sertifikovaniPsihoterapeut) {
+            Sertifikat sertifikat = sertifikovaniPsihoterapeut.getSertifikat();
+            lblSertifikatValue.setText(sertifikat.getDatum().toString());
+            lblSertifikatOblastValue.setText(sertifikat.getOblast().toString());
+        }else if (psihoterapeut instanceof Kandidat kandidat) {
+            lblSertifikatValue.setText("Nema");
+            lblSertifikatOblastValue.setText("Nema");
+        }
     }
 
     @Override

@@ -65,7 +65,7 @@ public class PaymentsScreen  extends JPanel implements ISubscriber {
     private void setTables() {
         ArrayList<Klijent> klijenti = new ArrayList<>();
         try {
-            klijenti.addAll(JDBCUtils.getKlijents());
+            klijenti.addAll(JDBCUtils.getKlijents(Session.getInstance().getPsihoterapeut()));
         } catch (SQLException e) {
             e.printStackTrace();
         }
