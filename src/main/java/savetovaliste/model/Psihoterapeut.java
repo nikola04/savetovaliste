@@ -1,24 +1,17 @@
 package savetovaliste.model;
 
-
-import savetovaliste.db.utility.JDBCUtils;
-
-import java.sql.SQLException;
 import java.util.Date;
 
 public class Psihoterapeut {
-    private int id;
-    private String ime;
-    private String prezime;
-    private String jmbg;
-    private String email;
-    private String telefon;
-    private Date datumRodjenja;
-    private int sertifikatId;
-    private int strukaId;
-    private Sertifikat sertifikat;
+    private final int id;
+    private final String ime;
+    private final String prezime;
+    private final String jmbg;
+    private final String email;
+    private final String telefon;
+    private final Date datumRodjenja;
 
-    public Psihoterapeut(int id, String ime, String prezime, String jmbg, String email, String telefon, Date datumRodjenja, int sertifikatId, int strukaId) {
+    public Psihoterapeut(int id, String ime, String prezime, String jmbg, String email, String telefon, Date datumRodjenja) {
         this.id = id;
         this.ime = ime;
         this.prezime = prezime;
@@ -26,31 +19,9 @@ public class Psihoterapeut {
         this.email = email;
         this.telefon = telefon;
         this.datumRodjenja = datumRodjenja;
-        this.sertifikatId = sertifikatId;
-        this.strukaId = strukaId;
     }
-
     public int getId() {
         return id;
-    }
-
-    public boolean fetchSertifikat(){
-        try{
-            this.sertifikat = JDBCUtils.getSertifikat(this.sertifikatId);
-            return true;
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return false;
-    }
-
-    public Sertifikat getSertifikat(){
-        if(sertifikat != null)
-            return sertifikat;
-        if(fetchSertifikat())
-            return sertifikat;
-
-        return null;
     }
 
     public String getIme() {
@@ -70,8 +41,5 @@ public class Psihoterapeut {
     }
     public Date getDatumRodjenja() {
         return datumRodjenja;
-    }
-    public int getStrukaId() {
-        return strukaId;
     }
 }

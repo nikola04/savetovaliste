@@ -1,6 +1,5 @@
 package savetovaliste.db.utility;
 
-import savetovaliste.Session;
 import savetovaliste.model.*;
 
 import java.sql.*;
@@ -10,47 +9,142 @@ import static savetovaliste.db.DBUtil.getConnection;
 
 public class JDBCUtils {
     public static Psihoterapeut loginPsihoterapeut(String email, String jmbg) throws SQLException {
-        String sql = "SELECT * FROM psihoterapeut WHERE email = ? AND jmbg = ?";
-        PreparedStatement stmt = getConnection().prepareStatement(sql);
+        String sql = "{ CALL loginPsihoterapeut(?, ?) }";
+        CallableStatement stmt = getConnection().prepareCall(sql);
         stmt.setString(1, email);
         stmt.setString(2, jmbg);
 
-        ResultSet rs = stmt.executeQuery();
+        boolean hasResult = stmt.execute();
+        if(!hasResult){
+            stmt.close();
+            return null;
+        }
 
+        ResultSet rs = stmt.getResultSet();
         Psihoterapeut psihoterapeut = null;
         if (rs.next()) {
-            int id = rs.getInt("psihoterapeut_id");
+            int id = rs.getInt("id");
             String ime = rs.getString("ime");
             String prezime = rs.getString("prezime");
-            String jmbg1 = rs.getString("jmbg");
-            String email1 = rs.getString("email");
             String telefon = rs.getString("telefon");
             Date date = rs.getDate("datum_rodjenja");
+            String prebivaliste = rs.getString("prebivaliste");
             int brojSertifikata = rs.getInt("sertifikat_id");
             int strukaId = rs.getInt("struka_id");
-            psihoterapeut = new Psihoterapeut(id, ime, prezime, jmbg1, email1, telefon, date, brojSertifikata, strukaId);
+            int studijaId = rs.getInt("studija_id");
+            int fakultetId = rs.getInt("fakultet_id");
+            int centarZaObukuId = rs.getInt("centar_za_obuku_id");
+            int supervizorId = rs.getInt("supervizor_id");
+            boolean kandidat = rs.getBoolean("kandidat");
+            if(kandidat)
+                psihoterapeut = new Kandidat(id, ime, prezime, jmbg, email, telefon, date, prebivaliste, supervizorId, studijaId, fakultetId, centarZaObukuId);
+            else
+                psihoterapeut = new SertifikovaniPsihoterapeut(id, ime, prezime, jmbg, email, telefon, date, brojSertifikata, strukaId);
         }
         rs.close();
         stmt.close();
         return psihoterapeut;
     }
+    public static Kandidat fetchKandidat(Kandidat kandidat) throws SQLException {
+        String sql = """
+                SELECT k.ime, k.prezime, k.telefon, k.prebivaliste, k.fakultet_id, f.naziv as fakultet, f.univerzitet_id, u.naziv as univerzitet, u.uze_usmerenje_id, uu.naziv as uze_usmerenje, k.studija_id, su.naziv as stepen_studija, k.centar_za_obuku_id,\s
+                co.naziv as centar_naziv, co.email as centar_email, co.telefon as centar_telefon, co.ulica as centar_ulica, co.broj as centar_broj, co.opstina as centar_opstina,
+                k.supervizor_id,
+                p.ime as supervizor_ime, p.prezime as supervizor_prezime, p.jmbg as supervizor_jmbg, p.email as supervizor_email, p.telefon as supervizor_telefon, p.datum_rodjenja as supervizor_datum_rodjenja, p.sertifikat_id as supervizor_sertifikat_id, p.struka_id as supervizor_struka_id
+                FROM kandidat k
+                INNER JOIN fakultet f ON k.fakultet_id = f.fakultet_id
+                INNER JOIN univerzitet u ON f.univerzitet_id = u.univerzitet_id
+                LEFT JOIN uze_usmerenje uu ON uu.uze_usmerenje_id = u.uze_usmerenje_id
+                INNER JOIN stepen_studija su ON su.stepen_studija_id = k.studija_id
+                INNER JOIN centar_za_obuku co ON co.centar_za_obuku_id = k.centar_za_obuku_id
+                INNER JOIN psihoterapeut p ON p.psihoterapeut_id = k.supervizor_id
+                WHERE k.kandidat_id = ?;
+        """;
+        PreparedStatement stmt = getConnection().prepareStatement(sql);
+        stmt.setInt(1, kandidat.getId());
+        ResultSet rs = stmt.executeQuery();
+        Kandidat k = null;
+        if(rs.next()){
+            String ime = rs.getString("ime");
+            String prezime = rs.getString("prezime");
+            String telefon = rs.getString("telefon");
+            Date datumRodjenja = rs.getDate("datum_rodjenja");
+            String prebivaliste = rs.getString("prebivaliste");
+
+            int fakultetId = rs.getInt("fakultet_id");
+            String fakultetNaziv = rs.getString("fakultet");
+            int univerzitetId = rs.getInt("univerzitet_id");
+            String univerzitetNaziv = rs.getString("univerzitet");
+            Number uzeUsmerenjeId = rs.getInt("uze_usmerenje_id");
+            String uzeUsmerenjeNaziv = rs.getString("uze_usmerenje");
+            UzeUsmerenjeUniverzitet uzeUsmerenjeUniverzitet;
+            if(uzeUsmerenjeNaziv == null) {
+                uzeUsmerenjeUniverzitet = null;
+            }else uzeUsmerenjeUniverzitet = new UzeUsmerenjeUniverzitet(uzeUsmerenjeId, uzeUsmerenjeNaziv);
+            Univerzitet univerzitet = new Univerzitet(univerzitetId, univerzitetNaziv, uzeUsmerenjeUniverzitet);
+            Fakultet fakultet = new Fakultet(fakultetId, fakultetNaziv, univerzitet);
+
+            int stepenStudijaId = rs.getInt("stepen_studija_id");
+            String stepenStudijaNaziv = rs.getString("stepen_studija");
+            Studija stepenStudija = new Studija(stepenStudijaId, stepenStudijaNaziv);
+
+            int centarZaObukuId = rs.getInt("centar_za_obuku_id");
+            String centarZaObukuNaziv = rs.getString("centar_naziv");
+            String centarZaObukuEmail = rs.getString("centar_email");
+            String centarZaObukuTelefon = rs.getString("centar_telefon");
+            String centarZaObukuUlica = rs.getString("centar_ulica");
+            int centarZaObukuBroj = rs.getInt("centar_broj");
+            String centarZaObukuOpstina = rs.getString("centar_opstina");
+
+            CentarZaObuku centarZaObuku = new CentarZaObuku(centarZaObukuId, centarZaObukuNaziv, centarZaObukuEmail, centarZaObukuTelefon, centarZaObukuUlica, centarZaObukuBroj, centarZaObukuOpstina);
+
+            int supervizorId = rs.getInt("supervizor_id");
+            String supervizorIme = rs.getString("supervizor_ime");
+            String supervizorPrezime = rs.getString("supervizor_prezime");
+            String supervizorJmbg = rs.getString("supervizor_jmbg");
+            String supervizorEmail = rs.getString("supervizor_email");
+            String supervizorTelefon = rs.getString("supervizor_telefon");
+            Date supervizorDatumRodjenja = rs.getDate("supervizor_datum_rodjenja");
+            int supervizorSertifikatId = rs.getInt("supervizor_sertifikat_id");
+            int supervizorStrukaId = rs.getInt("supervizor_struka_id");
+            Psihoterapeut supervizor = new SertifikovaniPsihoterapeut(supervizorId, supervizorIme, supervizorPrezime, supervizorJmbg, supervizorEmail, supervizorTelefon, supervizorDatumRodjenja, supervizorSertifikatId, supervizorStrukaId);
+
+            k = new Kandidat(kandidat.getId(), ime, prezime, kandidat.getJmbg(), kandidat.getEmail(), telefon, datumRodjenja, prebivaliste, supervizor, stepenStudija, fakultet, centarZaObuku);
+        }
+        rs.close();
+        stmt.close();
+        return k;
+    }
     public static ArrayList<Psihoterapeut> getPsihoterapeuts() throws SQLException {
-        String sql = "SELECT * FROM psihoterapeut";
-        Statement stmt = getConnection().createStatement();
+        String sql = "{ CALL sviPsihoterapeuti() }";
+        Statement stmt = getConnection().prepareCall(sql);
         ResultSet rs = stmt.executeQuery(sql);
         ArrayList<Psihoterapeut> psihoterapeuti = new ArrayList<>();
         while (rs.next()) {
-            int id = rs.getInt("psihoterapeut_id");
+            int id = rs.getInt("id");
             String ime = rs.getString("ime");
             String prezime = rs.getString("prezime");
-            String jmbg1 = rs.getString("jmbg");
-            String email1 = rs.getString("email");
+            String jmbg = rs.getString("jmbg");
+            String email = rs.getString("email");
             String telefon = rs.getString("telefon");
-            Date date = rs.getDate("datum_rodjenja");
-            int brojSertifikata = rs.getInt("sertifikat_id");
+            Date datum = rs.getDate("datum_rodjenja");
+
+            boolean sertifikovan = rs.getBoolean("sertifikovan");
             int strukaId = rs.getInt("struka_id");
-            Psihoterapeut psihoterapeut = new Psihoterapeut(id, ime, prezime, jmbg1, email1, telefon, date, brojSertifikata, strukaId);
-            psihoterapeuti.add(psihoterapeut);
+            int sertifikatId = rs.getInt("sertifikat_id");
+            String prebivaliste = rs.getString("prebivaliste");
+            int studijaId = rs.getInt("stepen_studija_id");
+            int fakultetId = rs.getInt("fakultet_id");
+            int centarZaObukuId = rs.getInt("centar_za_obuku_id");
+            int supervizorId = rs.getInt("supervizor_id");
+
+            if(sertifikovan) {
+                SertifikovaniPsihoterapeut psihoterapeut = new SertifikovaniPsihoterapeut(id, ime, prezime, jmbg, email, telefon, datum, sertifikatId, strukaId);
+                psihoterapeuti.add(psihoterapeut);
+            }else{
+                Kandidat kandidat = new Kandidat(id, ime, prezime, jmbg, email, telefon, datum, prebivaliste, supervizorId, studijaId, fakultetId, centarZaObukuId);
+                psihoterapeuti.add(kandidat);
+            }
         }
         rs.close();
         stmt.close();
@@ -63,10 +157,16 @@ public class JDBCUtils {
                                 FROM seansa as s INNER JOIN cena_seanse ON cena_seanse.cena_seanse_id = s.cena_seanse_id
                                 INNER JOIN klijent as k ON k.klijent_id = s.klijent_id
                                 INNER JOIN prijava as p ON p.prijava_id = k.prijava_id
-                                WHERE p.psihoterapeut_id = ? AND (s.dan < CURRENT_DATE OR (s.dan = CURRENT_DATE AND ADDTIME(s.vreme, SEC_TO_TIME(s.vreme_trajanja * 60)) <= CURRENT_TIME))
+                                WHERE (p.psihoterapeut_id = ? OR p.kandidat_id = ?) AND (s.dan < CURRENT_DATE OR (s.dan = CURRENT_DATE AND ADDTIME(s.vreme, SEC_TO_TIME(s.vreme_trajanja * 60)) <= CURRENT_TIME))
                                 ORDER BY s.dan, s.vreme;""";
         PreparedStatement stmt = getConnection().prepareStatement(sql);
-        stmt.setInt(1, psihoterapeut.getId());
+        if(psihoterapeut instanceof SertifikovaniPsihoterapeut) {
+            stmt.setInt(1, psihoterapeut.getId());
+            stmt.setNull(2, Types.INTEGER);
+        }else {
+            stmt.setNull(1, Types.INTEGER);
+            stmt.setInt(2, psihoterapeut.getId());
+        }
         ResultSet rs = stmt.executeQuery();
 
         ArrayList<Seansa> seanse = new ArrayList<>();
@@ -181,8 +281,9 @@ public class JDBCUtils {
                 )
                 
                 INNER JOIN cena_seanse cs ON cs.cena_seanse_id = s.cena_seanse_id
-                WHERE s.klijent_id = ? AND s.prva != 1 AND (
-                    (s.na_rate = 0 AND NOT EXISTS(
+                WHERE s.klijent_id = ? AND s.prva != 1
+                    AND (s.dan < CURRENT_DATE OR (s.dan = CURRENT_DATE AND ADDTIME(s.vreme, SEC_TO_TIME(s.vreme_trajanja * 60)) <= CURRENT_TIME))
+                    AND ((s.na_rate = 0 AND NOT EXISTS(
                         SELECT 1 FROM placanje as p WHERE p.seansa_id = s.seansa_id
                     ))
                     OR
@@ -247,14 +348,20 @@ public class JDBCUtils {
         return placanja;
     }
 
-    public static ArrayList<Klijent> getKlijents() throws SQLException {
+    public static ArrayList<Klijent> getKlijents(Psihoterapeut psihoterapeut) throws SQLException {
         String sql = "SELECT k.* " +
                 "FROM klijent k " +
                 "JOIN prijava p ON k.prijava_id = p.prijava_id " +
-                "WHERE p.psihoterapeut_id = ?";
+                "WHERE (p.psihoterapeut_id = ? OR p.kandidat_id = ?)";
 
         PreparedStatement stmt = getConnection().prepareStatement(sql);
-        stmt.setInt(1, Session.getInstance().getPsihoterapeut().getId());
+        if(psihoterapeut instanceof SertifikovaniPsihoterapeut) {
+            stmt.setInt(1, psihoterapeut.getId());
+            stmt.setNull(2, Types.INTEGER);
+        }else {
+            stmt.setNull(1, Types.INTEGER);
+            stmt.setInt(2, psihoterapeut.getId());
+        }
         ResultSet rs = stmt.executeQuery();
         ArrayList<Klijent> klijenti = new ArrayList<>();
         while (rs.next()) {
@@ -278,10 +385,16 @@ public class JDBCUtils {
                 "                FROM seansa as s INNER JOIN cena_seanse ON cena_seanse.cena_seanse_id = s.cena_seanse_id " +
                 "                INNER JOIN klijent as k ON k.klijent_id = s.klijent_id " +
                 "                INNER JOIN prijava as p ON p.prijava_id = k.prijava_id " +
-                "                WHERE p.psihoterapeut_id = ? AND s.dan > CURRENT_DATE OR (s.dan = CURRENT_DATE AND ADDTIME(s.vreme, SEC_TO_TIME(s.vreme_trajanja * 60)) > CURRENT_TIME) " +
+                "                WHERE (p.psihoterapeut_id = ? OR p.kandidat_id = ?) AND s.dan > CURRENT_DATE OR (s.dan = CURRENT_DATE AND ADDTIME(s.vreme, SEC_TO_TIME(s.vreme_trajanja * 60)) > CURRENT_TIME) " +
                 "                ORDER BY s.dan, s.vreme;";
         PreparedStatement stmt = getConnection().prepareStatement(sql);
-        stmt.setInt(1, psihoterapeut.getId());
+        if(psihoterapeut instanceof SertifikovaniPsihoterapeut) {
+            stmt.setInt(1, psihoterapeut.getId());
+            stmt.setNull(2, Types.INTEGER);
+        }else {
+            stmt.setNull(1, Types.INTEGER);
+            stmt.setInt(2, psihoterapeut.getId());
+        }
         ResultSet rs = stmt.executeQuery();
 
         ArrayList<Seansa> seanse = new ArrayList<>();
@@ -408,9 +521,15 @@ public class JDBCUtils {
 
     public static ArrayList<Prijava> getPsihoterapeutPrijave(Psihoterapeut psihoterapeut) throws SQLException {
         ArrayList<Prijava> prijave = new ArrayList<>();
-        String sql = "SELECT prijava.prijava_id as prijava_id, klijent_id, ime, prezime, datum_rodjenja, pol, email, broj, ranije_terapije FROM klijent INNER JOIN prijava ON prijava.prijava_id = klijent.prijava_id WHERE prijava.psihoterapeut_id = ?";
+        String sql = "SELECT prijava.prijava_id as prijava_id, klijent_id, ime, prezime, datum_rodjenja, pol, email, broj, ranije_terapije FROM klijent INNER JOIN prijava ON prijava.prijava_id = klijent.prijava_id WHERE (prijava.psihoterapeut_id = ? OR prijava.kandidat_id = ?)";
         PreparedStatement stmt = getConnection().prepareStatement(sql);
-        stmt.setInt(1, psihoterapeut.getId());
+        if(psihoterapeut instanceof SertifikovaniPsihoterapeut) {
+            stmt.setInt(1, psihoterapeut.getId());
+            stmt.setNull(2, Types.INTEGER);
+        }else {
+            stmt.setNull(1, Types.INTEGER);
+            stmt.setInt(2, psihoterapeut.getId());
+        }
         ResultSet rs = stmt.executeQuery();
 
         while (rs.next()) {
@@ -484,7 +603,7 @@ public class JDBCUtils {
 
     public static ArrayList<Testiranje> getTestiranja(Seansa seansa) throws SQLException {
         String sql = """
-                SELECT t.testiranje_id, t.rezultat, t.test_id, te.naziv, te.cena, te.oblast_testa_id as oblast_id, ot.naziv as oblast, CASE 
+                SELECT t.testiranje_id, t.rezultat, t.test_id, te.naziv, te.cena, te.oblast_testa_id as oblast_id, ot.naziv as oblast, CASE\s
                 WHEN t.placanje_id IS NOT NULL
                     THEN TRUE
                     ELSE FALSE

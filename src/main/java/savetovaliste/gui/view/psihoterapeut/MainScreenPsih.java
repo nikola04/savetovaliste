@@ -120,10 +120,25 @@ public class MainScreenPsih extends JPanel implements ISubscriber {
             if(JOptionPane.showConfirmDialog(null, "Jeste li sigurni da zelite da se odjavite", "Potvrdite odjavu", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION)
                 Session.getInstance().logoutUser();
         });
-        btnShowProfile.addActionListener(_ -> profileFrame.setVisible(true));
-        btnClientApplications.addActionListener(_ -> clientApplicationsFrame.setVisible(true));
-        btnPastSessions.addActionListener(_ -> pastSessionsFrame.setVisible(true));
-        btnUpcomingSessions.addActionListener(_ -> upcomingSessionsFrame.setVisible(true));
-        btnPayments.addActionListener(_ -> paymentsFrame.setVisible(true));
+        btnShowProfile.addActionListener(_ -> {
+            ProfileScreen.getInstance();
+            profileFrame.setVisible(true);
+        });
+        btnClientApplications.addActionListener(_ -> {
+            ClientApplicScreen.getInstance();
+            clientApplicationsFrame.setVisible(true);
+        });
+        btnPastSessions.addActionListener(_ -> {
+            pastSessionsFrame.setVisible(true);
+            PastSessionsScreen.getInstance();
+        });
+        btnUpcomingSessions.addActionListener(_ -> {
+            upcomingSessionsFrame.setVisible(true);
+            UpcSessionsScreen.getInstance();
+        });
+        btnPayments.addActionListener(_ -> {
+            paymentsFrame.setVisible(true);
+            PaymentsScreen.getInstance();
+        });
     }
 }

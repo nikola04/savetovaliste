@@ -1,8 +1,8 @@
 package savetovaliste.gui.view.forms;
 
-import savetovaliste.db.DBUtil;
 import savetovaliste.db.utility.JDBCUtils;
 import savetovaliste.model.Psihoterapeut;
+import savetovaliste.model.SertifikovaniPsihoterapeut;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -43,7 +43,7 @@ public class PsihoInfoForm {
         model.addColumn("Email");
         model.addColumn("Telefon");
         model.addColumn("Datum Rodjenja");
-        model.addColumn("Broj Sertifikata");
+        model.addColumn("Sertifikovan");
         for (Psihoterapeut p : psihoterapeuts) {
             int id = p.getId();
             String ime = p.getIme();
@@ -52,9 +52,9 @@ public class PsihoInfoForm {
             String email = p.getEmail();
             String telefon = p.getTelefon();
             java.util.Date date = p.getDatumRodjenja();
-            int brojSertifikata = p.getSertifikat().getId();
+            String sertifikovan = (p instanceof SertifikovaniPsihoterapeut) ? "DA" : "NE";
 
-            model.addRow(new Object[]{id, ime, prezime, jmbg,email, telefon, date, brojSertifikata});
+            model.addRow(new Object[]{id, ime, prezime, jmbg,email, telefon, date, sertifikovan});
         }
         psihoTable.setModel(model);
     }

@@ -23,6 +23,7 @@ public class PaymentsScreen  extends JPanel implements ISubscriber {
             instance = new PaymentsScreen();
             instance.initialize();
         }
+        instance.setTables();
         return instance;
     }
 
@@ -43,7 +44,7 @@ public class PaymentsScreen  extends JPanel implements ISubscriber {
         modelKlijenti.addColumn("Ranije terapije");
         modelKlijenti.addColumn("Uplate");
         modelKlijenti.addColumn("Dugovanja");
-
+        klijentiTable.setModel(modelKlijenti);
 
         this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
         this.setAlignmentX(CENTER_ALIGNMENT);
@@ -65,10 +66,11 @@ public class PaymentsScreen  extends JPanel implements ISubscriber {
     private void setTables() {
         ArrayList<Klijent> klijenti = new ArrayList<>();
         try {
-            klijenti.addAll(JDBCUtils.getKlijents());
+            klijenti.addAll(JDBCUtils.getKlijents(Session.getInstance().getPsihoterapeut()));
         } catch (SQLException e) {
             e.printStackTrace();
         }
+        modelKlijenti.setRowCount(0);
         for(Klijent klijent : klijenti) {
             String s = "NE";
             if(klijent.isRanijeTerapije())
@@ -76,7 +78,6 @@ public class PaymentsScreen  extends JPanel implements ISubscriber {
 
             modelKlijenti.addRow(new Object[]{klijent.getId(),klijent.getIme(), klijent.getPrezime(), klijent.getEmail(),klijent.getTelefon() ,klijent.getDatumRodjenja(), s,"Uplata","Dug"});
         }
-        klijentiTable.setModel(modelKlijenti);
     }
 
     @Override
