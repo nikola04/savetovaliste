@@ -62,7 +62,7 @@ public class MainScreenPsih extends JPanel implements ISubscriber {
 
         profileFrame = new JFrame("Moj Profil");
         profileFrame.setContentPane(ProfileScreen.getInstance());
-        profileFrame.setSize(500, 320);
+        profileFrame.setSize(500, 420);
 
         clientApplicationsFrame = new JFrame("Prijave klijenta");
         clientApplicationsFrame.setContentPane(ClientApplicScreen.getInstance());

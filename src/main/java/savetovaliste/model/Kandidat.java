@@ -53,10 +53,14 @@ public class Kandidat extends Psihoterapeut{
             this.fakultetId = k.fakultetId;
             this.fakultet = k.getFakultet();
             this.centarZaObukuId = k.centarZaObukuId;
-            this.centarZaObuku = this.getCentarZaObuku();
+            this.centarZaObuku = k.getCentarZaObuku();
         }catch (SQLException e){
             e.printStackTrace();
         }
+    }
+
+    public String getPrebivaliste() {
+        return prebivaliste;
     }
 
     public Psihoterapeut getSupervizor() {

@@ -13,6 +13,7 @@ import java.awt.*;
 public class ProfileScreen extends JPanel implements ISubscriber {
     private static ProfileScreen instance;
     private JLabel lblHeading;
+    private GridBagConstraints gbc;
     // Profil
     private JLabel lblId;
     private JLabel lblIme;
@@ -33,6 +34,17 @@ public class ProfileScreen extends JPanel implements ISubscriber {
     private JLabel lblSertifikatOblast;
     private JLabel lblSertifikatValue;
     private JLabel lblSertifikatOblastValue;
+    // Kandidat
+    private JLabel lblKandidatPrebivaliste;
+    private JLabel lblKandidatStepenStudija;
+    private JLabel lblKandidatFakultet;
+    private JLabel lblKandidatUniverzitet;
+    private JLabel lblKandidatCentarZaObuku;
+    private JLabel lblKandidatPrebivalisteValue;
+    private JLabel lblKandidatStepenStudijaValue;
+    private JLabel lblKandidatFakultetValue;
+    private JLabel lblKandidatUniverzitetValue;
+    private JLabel lblKandidatCentarZaObukuValue;
 
     public static ProfileScreen getInstance(){
         if(instance == null) {
@@ -58,6 +70,11 @@ public class ProfileScreen extends JPanel implements ISubscriber {
         lblDatumRodjenja = new JLabel("Datum rodjenja: ");
         lblSertifikatDatum = new JLabel("Datum sertifikata: ");
         lblSertifikatOblast = new JLabel("Oblast sertifikata: ");
+        lblKandidatPrebivaliste = new JLabel("Prebivaliste: ");
+        lblKandidatStepenStudija = new JLabel("Stepen studija: ");
+        lblKandidatFakultet = new JLabel("Fakultet: ");
+        lblKandidatUniverzitet = new JLabel("Univerzitet: ");
+        lblKandidatCentarZaObuku = new JLabel("Centar za obuku: ");
 
         lblIdValue = new JLabel();
         lblImeValue = new JLabel();
@@ -68,13 +85,18 @@ public class ProfileScreen extends JPanel implements ISubscriber {
         lblDatumRodjenjaValue = new JLabel();
         lblSertifikatValue = new JLabel();
         lblSertifikatOblastValue = new JLabel();
+        lblKandidatPrebivalisteValue = new JLabel();
+        lblKandidatStepenStudijaValue = new JLabel();
+        lblKandidatFakultetValue = new JLabel();
+        lblKandidatUniverzitetValue = new JLabel();
+        lblKandidatCentarZaObukuValue = new JLabel();
     }
 
     private void initializeGUI(){
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
         JPanel panel = new JPanel(new GridBagLayout());
-        GridBagConstraints gbc = new GridBagConstraints();
+        gbc = new GridBagConstraints();
         gbc.insets = new Insets(2, 10, 2, 10);
         gbc.anchor = GridBagConstraints.WEST;
         gbc.fill = GridBagConstraints.HORIZONTAL;
@@ -93,8 +115,52 @@ public class ProfileScreen extends JPanel implements ISubscriber {
         addRow(panel, gbc, 6, lblDatumRodjenja, lblDatumRodjenjaValue);
         addRow(panel, gbc, 7, lblSertifikatDatum, lblSertifikatValue);
         addRow(panel, gbc, 8, lblSertifikatOblast, lblSertifikatOblastValue);
+        addRow(panel, gbc, 9, lblKandidatPrebivaliste, lblKandidatPrebivalisteValue);
+        addRow(panel, gbc, 10, lblKandidatStepenStudija, lblKandidatStepenStudijaValue);
+        addRow(panel, gbc, 11, lblKandidatFakultet, lblKandidatFakultetValue);
+        addRow(panel, gbc, 12, lblKandidatUniverzitet, lblKandidatUniverzitetValue);
+        addRow(panel, gbc, 13, lblKandidatCentarZaObuku, lblKandidatCentarZaObukuValue);
 
         add(panel, BorderLayout.CENTER);
+
+        add(Box.createVerticalStrut(10), BorderLayout.SOUTH);
+    }
+
+    private void updateGUI(Psihoterapeut psihoterapeut){
+        if(psihoterapeut instanceof Kandidat kandidat) {
+            lblKandidatPrebivaliste.setVisible(true);
+            lblKandidatStepenStudija.setVisible(true);
+            lblKandidatFakultet.setVisible(true);
+            lblKandidatUniverzitet.setVisible(true);
+            lblKandidatCentarZaObuku.setVisible(true);
+            lblKandidatFakultetValue.setVisible(true);
+            lblKandidatStepenStudijaValue.setVisible(true);
+            lblKandidatPrebivalisteValue.setVisible(true);
+            lblKandidatUniverzitetValue.setVisible(true);
+            lblKandidatCentarZaObukuValue.setVisible(true);
+
+            System.out.println(kandidat.getPrebivaliste());
+            System.out.println(kandidat.getStudija());
+            System.out.println(kandidat.getFakultet());
+            System.out.println(kandidat.getCentarZaObuku());
+
+            lblKandidatFakultetValue.setText(kandidat.getFakultet().toString());
+            lblKandidatStepenStudijaValue.setText(kandidat.getStudija().getNaziv());
+            lblKandidatPrebivalisteValue.setText(kandidat.getPrebivaliste());
+            lblKandidatUniverzitetValue.setText(kandidat.getFakultet().getUniverzitet().getNaziv());
+            lblKandidatCentarZaObukuValue.setText(kandidat.getCentarZaObuku().getNaziv());
+        }else{
+            lblKandidatPrebivaliste.setVisible(false);
+            lblKandidatStepenStudija.setVisible(false);
+            lblKandidatFakultet.setVisible(false);
+            lblKandidatUniverzitet.setVisible(false);
+            lblKandidatCentarZaObuku.setVisible(false);
+            lblKandidatPrebivalisteValue.setVisible(false);
+            lblKandidatFakultetValue.setVisible(false);
+            lblKandidatUniverzitetValue.setVisible(false);
+            lblKandidatCentarZaObukuValue.setVisible(false);
+            lblKandidatStepenStudijaValue.setVisible(false);
+        }
     }
 
     private void addRow(JPanel panel, GridBagConstraints gbc, int row, JLabel label, JLabel value) {
@@ -124,10 +190,12 @@ public class ProfileScreen extends JPanel implements ISubscriber {
             Sertifikat sertifikat = sertifikovaniPsihoterapeut.getSertifikat();
             lblSertifikatValue.setText(sertifikat.getDatum().toString());
             lblSertifikatOblastValue.setText(sertifikat.getOblast().toString());
-        }else if (psihoterapeut instanceof Kandidat kandidat) {
+        }else if (psihoterapeut instanceof Kandidat) {
             lblSertifikatValue.setText("Nema");
             lblSertifikatOblastValue.setText("Nema");
         }
+
+        updateGUI(psihoterapeut);
     }
 
     @Override

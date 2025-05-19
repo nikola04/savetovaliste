@@ -47,7 +47,7 @@ public class JDBCUtils {
     }
     public static Kandidat fetchKandidat(Kandidat kandidat) throws SQLException {
         String sql = """
-                SELECT k.ime, k.prezime, k.telefon, k.prebivaliste, k.fakultet_id, f.naziv as fakultet, f.univerzitet_id, u.naziv as univerzitet, u.uze_usmerenje_id, uu.naziv as uze_usmerenje, k.studija_id, su.naziv as stepen_studija, k.centar_za_obuku_id,\s
+                SELECT k.ime, k.prezime, k.telefon, k.prebivaliste, k.datum_rodjenja, k.fakultet_id, f.naziv as fakultet, f.univerzitet_id, u.naziv as univerzitet, u.uze_usmerenje_id, uu.naziv as uze_usmerenje, k.studija_id as stepen_studija_id, su.naziv as stepen_studija, k.centar_za_obuku_id,\s
                 co.naziv as centar_naziv, co.email as centar_email, co.telefon as centar_telefon, co.ulica as centar_ulica, co.broj as centar_broj, co.opstina as centar_opstina,
                 k.supervizor_id,
                 p.ime as supervizor_ime, p.prezime as supervizor_prezime, p.jmbg as supervizor_jmbg, p.email as supervizor_email, p.telefon as supervizor_telefon, p.datum_rodjenja as supervizor_datum_rodjenja, p.sertifikat_id as supervizor_sertifikat_id, p.struka_id as supervizor_struka_id
