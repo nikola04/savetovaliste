@@ -281,8 +281,9 @@ public class JDBCUtils {
                 )
                 
                 INNER JOIN cena_seanse cs ON cs.cena_seanse_id = s.cena_seanse_id
-                WHERE s.klijent_id = ? AND s.prva != 1 AND (
-                    (s.na_rate = 0 AND NOT EXISTS(
+                WHERE s.klijent_id = ? AND s.prva != 1
+                    AND (s.dan < CURRENT_DATE OR (s.dan = CURRENT_DATE AND ADDTIME(s.vreme, SEC_TO_TIME(s.vreme_trajanja * 60)) <= CURRENT_TIME))
+                    AND ((s.na_rate = 0 AND NOT EXISTS(
                         SELECT 1 FROM placanje as p WHERE p.seansa_id = s.seansa_id
                     ))
                     OR
