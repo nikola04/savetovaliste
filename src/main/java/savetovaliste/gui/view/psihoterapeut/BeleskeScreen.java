@@ -88,6 +88,10 @@ public class BeleskeScreen extends JPanel {
                     JDBCUtils.addBeleske(newText,seansa.getId());
                     fetchData();
                 } catch (SQLException ex) {
+                    if(ex.getMessage().equals("Seansa nije u toku ili nije dostupna za belešku.")){
+                        JOptionPane.showMessageDialog(null, "Seansa nije u toku", "Greska", JOptionPane.ERROR_MESSAGE);
+                        return;
+                    }
                     JOptionPane.showMessageDialog(null, "Desila se greska. Molimo vas pokusajte ponovo.", "Greska", JOptionPane.ERROR_MESSAGE);
                     ex.printStackTrace();
                 }

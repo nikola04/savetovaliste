@@ -210,6 +210,61 @@ public class JDBCUtils {
 
         return seanse;
     }
+
+    public static Kandidat getKandidat(int kandidatId) throws SQLException {
+        String sql = "SELECT * FROM kandidat k WHERE k.kandidat_id = ?";
+        PreparedStatement stmt = getConnection().prepareStatement(sql);
+        stmt.setInt(1, kandidatId);
+        ResultSet rs = stmt.executeQuery();
+        Kandidat kandidat = null;
+        if(rs.next()) {
+            int id = rs.getInt("kandidat_id");
+            String ime = rs.getString("ime");
+            String prezime = rs.getString("prezime");
+            String jmbg = rs.getString("jmbg");
+            String email = rs.getString("email");
+            String telefon = rs.getString("telefon");
+            Date datum = rs.getDate("datum_rodjenja");
+            String prebivaliste = rs.getString("prebivaliste");
+            int supervizorId = rs.getInt("supervizor_id");
+            int studijaId = rs.getInt("studija_id");
+            int fakultetId = rs.getInt("fakultet_id");
+            int centarZaObukuId = rs.getInt("centar_za_obuku_id");
+
+            kandidat = new Kandidat(id, ime, prezime, jmbg, email, telefon, datum, prebivaliste, supervizorId, studijaId, fakultetId, centarZaObukuId);
+        }
+        rs.close();
+        stmt.close();
+        return kandidat;
+    }
+
+    public static ArrayList<Kandidat> getKandidati(Psihoterapeut supervizor) throws SQLException {
+        String sql = "SELECT * FROM kandidat k WHERE k.supervizor_id = ?";
+        PreparedStatement stmt = getConnection().prepareStatement(sql);
+        stmt.setInt(1, supervizor.getId());
+        ResultSet rs = stmt.executeQuery();
+        ArrayList<Kandidat> kandidati = new ArrayList<>();
+        while (rs.next()) {
+            int id = rs.getInt("kandidat_id");
+            String ime = rs.getString("ime");
+            String prezime = rs.getString("prezime");
+            String jmbg = rs.getString("jmbg");
+            String email = rs.getString("email");
+            String telefon = rs.getString("telefon");
+            Date datum = rs.getDate("datum_rodjenja");
+            String prebivaliste = rs.getString("prebivaliste");
+            int studijaId = rs.getInt("studija_id");
+            int fakultetId = rs.getInt("fakultet_id");
+            int centarZaObukuId = rs.getInt("centar_za_obuku_id");
+
+            Kandidat k = new Kandidat(id, ime, prezime, jmbg, email, telefon, datum, prebivaliste, supervizor.getId(), studijaId, fakultetId, centarZaObukuId);
+            kandidati.add(k);
+        }
+        rs.close();
+        stmt.close();
+        return kandidati;
+    }
+
     public static Klijent getKlijent(int klijentId) throws SQLException {
         String sql = "SELECT * FROM klijent WHERE klijent_id = ?";
         PreparedStatement stmt = getConnection().prepareStatement(sql);
@@ -238,70 +293,9 @@ public class JDBCUtils {
     }
 
     public static ArrayList<Neplaceno> getNeplaceno(Klijent klijent) throws SQLException {
-        String sql = """
-                SELECT testiranje_id as id, 'testiranje' as tip, te.cena as iznos, FALSE as na_rate, FALSE as placeno, te.cena as nedostaje, FALSE as istekao_rok
-                FROM testiranje AS t INNER JOIN test as te ON te.test_id = t.test_id\s
-                INNER JOIN seansa AS s ON t.seansa_id = s.seansa_id
-                WHERE t.placanje_id IS NULL AND s.klijent_id = ?\s
-                
-                UNION
-                
-                SELECT\s
-                    s.seansa_id as id, 'seansa' as tip, cs.cena as iznos,\s
-                    s.na_rate as na_rate,
-                    CASE
-                    \tWHEN s.na_rate = 1 AND (COALESCE(p1.iznos * k1.kurs_din, 0) + COALESCE(p1.iznos * k2.kurs_din, 0)) >= cs.cena
-                        THEN TRUE
-                        ELSE FALSE
-                    END as placeno,
-                    CASE
-                    \tWHEN (COALESCE(p1.iznos * k1.kurs_din, 0) + COALESCE(p1.iznos * k2.kurs_din, 0)) >= cs.cena
-                        THEN 0
-                        ELSE (cs.cena - COALESCE(p1.iznos * k1.kurs_din, 0) - COALESCE(p1.iznos * k2.kurs_din, 0))
-                    END as nedostaje,
-                    CASE\s
-                        WHEN s.na_rate = 1 AND (
-                            (p2.placanje_id IS NULL AND DATE_ADD(s.dan, INTERVAL 30 DAY) < CURRENT_DATE)
-                            OR
-                            (p2.placanje_id IS NOT NULL AND DATE_ADD(s.dan, INTERVAL 30 DAY) < p2.datum))
-                        THEN TRUE
-                        ELSE FALSE
-                    END as istekao_rok
-                FROM seansa s
-                LEFT JOIN placanje p1 ON p1.seansa_id = s.seansa_id AND p1.rata = 1
-                LEFT JOIN placanje p2 ON p2.seansa_id = s.seansa_id AND p2.rata = 2
-                
-                LEFT JOIN kurs_valute k1 ON k1.valuta_id = p1.valuta_valuta_id AND k1.datum = (
-                    SELECT MAX(datum) FROM kurs_valute
-                    WHERE valuta_id = p1.valuta_valuta_id AND datum <= p1.datum
-                )
-                LEFT JOIN kurs_valute k2 ON k2.valuta_id = p2.valuta_valuta_id AND k2.datum = (
-                    SELECT MAX(datum) FROM kurs_valute
-                    WHERE valuta_id = p2.valuta_valuta_id AND datum <= p2.datum
-                )
-                
-                INNER JOIN cena_seanse cs ON cs.cena_seanse_id = s.cena_seanse_id
-                WHERE s.klijent_id = ? AND s.prva != 1
-                    AND (s.dan < CURRENT_DATE OR (s.dan = CURRENT_DATE AND ADDTIME(s.vreme, SEC_TO_TIME(s.vreme_trajanja * 60)) <= CURRENT_TIME))
-                    AND ((s.na_rate = 0 AND NOT EXISTS(
-                        SELECT 1 FROM placanje as p WHERE p.seansa_id = s.seansa_id
-                    ))
-                    OR
-                    (s.na_rate = 1 AND (
-                        p1.placanje_id IS NULL
-                        OR
-                        p1.iznos * k1.kurs_din < 0.3 * cs.cena
-                        OR
-                        p2.placanje_id IS NULL
-                        OR
-                        (p1.iznos * k1.kurs_din + p2.iznos * k2.kurs_din) < cs.cena
-                        OR
-                        DATE_ADD(s.dan, INTERVAL 30 DAY) < p2.datum
-                    ))
-                );""";
-        PreparedStatement stmt = getConnection().prepareStatement(sql);
+        String sql = "{ CALL sveNeplaceno(?) }";
+        CallableStatement stmt = getConnection().prepareCall(sql);
         stmt.setInt(1, klijent.getId());
-        stmt.setInt(2, klijent.getId());
         ResultSet rs = stmt.executeQuery();
         ArrayList<Neplaceno> neplacene = new ArrayList<>();
         while (rs.next()) {

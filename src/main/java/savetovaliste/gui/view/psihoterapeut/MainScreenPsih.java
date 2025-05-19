@@ -4,6 +4,7 @@ import org.w3c.dom.Text;
 import savetovaliste.Session;
 import savetovaliste.controller.observer.ISubscriber;
 import savetovaliste.model.Psihoterapeut;
+import savetovaliste.model.SertifikovaniPsihoterapeut;
 
 import javax.swing.*;
 import java.awt.*;
@@ -12,13 +13,13 @@ import java.awt.event.ActionListener;
 
 public class MainScreenPsih extends JPanel implements ISubscriber {
     private static MainScreenPsih instance;
-    private Psihoterapeut psihoterapeut;
 
     private JFrame profileFrame;
     private JFrame clientApplicationsFrame;
     private JFrame pastSessionsFrame;
     private JFrame upcomingSessionsFrame;
     private JFrame paymentsFrame;
+    private JFrame kandidatiFrame;
 
     private Button btnLogout;
     private Button btnShowProfile;
@@ -26,6 +27,7 @@ public class MainScreenPsih extends JPanel implements ISubscriber {
     private Button btnPastSessions;
     private Button btnUpcomingSessions;
     private Button btnPayments;
+    private Button btnKandidati;
     private JLabel lblGreeting;
 
     public static MainScreenPsih getInstance() {
@@ -41,8 +43,9 @@ public class MainScreenPsih extends JPanel implements ISubscriber {
     private MainScreenPsih(){}
 
     private void updateData(){
-        psihoterapeut = Session.getInstance().getPsihoterapeut();
+        Psihoterapeut psihoterapeut = Session.getInstance().getPsihoterapeut();
         if(psihoterapeut == null) return;
+        btnKandidati.setVisible(psihoterapeut instanceof SertifikovaniPsihoterapeut);
         lblGreeting.setText("Dobrodosli " + psihoterapeut.getIme() + "!");
     }
 
@@ -80,12 +83,17 @@ public class MainScreenPsih extends JPanel implements ISubscriber {
         paymentsFrame.setContentPane(PaymentsScreen.getInstance());
         paymentsFrame.setSize(800, 400);
 
+        kandidatiFrame = new JFrame("Kandidati");
+        kandidatiFrame.setContentPane(KandidatiScreen.getInstance());
+        kandidatiFrame.setSize(800, 400);
+
         btnLogout = new Button("Odjavi se");
         btnShowProfile = new Button("Moj Profil");
         btnClientApplications = new Button("Prijave klijenta");
         btnPastSessions = new Button("Odrzane Seanse");
         btnUpcomingSessions = new Button("Buduci termini");
         btnPayments = new Button("Uplate i dugovanja");
+        btnKandidati = new Button("Kandidati");
 
         lblGreeting = new JLabel("Pozdrav!");
     }
@@ -105,6 +113,7 @@ public class MainScreenPsih extends JPanel implements ISubscriber {
         addButton(mainPanel, btnPastSessions);
         addButton(mainPanel, btnUpcomingSessions);
         addButton(mainPanel, btnPayments);
+        addButton(mainPanel, btnKandidati);
         addButton(mainPanel, btnLogout);
 
         add(mainPanel, BorderLayout.CENTER);
@@ -139,6 +148,10 @@ public class MainScreenPsih extends JPanel implements ISubscriber {
         btnPayments.addActionListener(_ -> {
             paymentsFrame.setVisible(true);
             PaymentsScreen.getInstance();
+        });
+        btnKandidati.addActionListener(_ -> {
+            kandidatiFrame.setVisible(true);
+            KandidatiScreen.getInstance();
         });
     }
 }

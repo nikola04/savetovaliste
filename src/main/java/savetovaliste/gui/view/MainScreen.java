@@ -11,10 +11,6 @@ import java.awt.event.ActionListener;
 
 public class MainScreen extends JPanel {
     private static MainScreen instance;
-    private Button showPsihoBtn;
-    private Button signUpBtn;
-    private Button logInBtn;
-    private JLabel regLbl;
     private LogInFrom logIn;
 
 
@@ -32,13 +28,13 @@ public class MainScreen extends JPanel {
     }
 
     private void initializeGUI() {
-        showPsihoBtn = new Button("Prikazi info o psihoterapeutima");
+        Button showPsihoBtn = new Button("Prikazi info o psihoterapeutima");
 
-        logInBtn = new Button("Log in");
+        Button logInBtn = new Button("Log in");
 
-        signUpBtn = new Button("Sign up");
+        Button signUpBtn = new Button("Sign up");
 
-        regLbl = new JLabel("Savetovaliste \"Novi Pocetak\"");
+        JLabel regLbl = new JLabel("Savetovaliste \"Novi Pocetak\"");
         regLbl.setFont(new Font("Arial", Font.BOLD, 20));
 
         setLayout(new BorderLayout());

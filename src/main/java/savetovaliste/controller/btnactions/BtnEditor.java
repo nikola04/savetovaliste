@@ -1,6 +1,7 @@
 package savetovaliste.controller.btnactions;
 
 import savetovaliste.gui.view.psihoterapeut.DugovanjeKlijenta;
+import savetovaliste.gui.view.psihoterapeut.KandidatSeanseFrame;
 import savetovaliste.gui.view.psihoterapeut.SeansaScreen;
 import savetovaliste.gui.view.psihoterapeut.UplateKlijenta;
 
@@ -37,19 +38,23 @@ public Object getCellEditorValue() {
 @Override
 public void actionPerformed(ActionEvent e) {
     int row = table.getSelectedRow();
-    int klijentSeansaId = (int) table.getValueAt(row, 0);
+    int objectId = (int) table.getValueAt(row, 0);
     switch (label) {
         case "Uplate" -> {
-            UplateKlijenta.getInstance(klijentSeansaId);
-            UplateKlijenta.getInstance(klijentSeansaId).setVisible(true);
+            UplateKlijenta.getInstance(objectId);
+            UplateKlijenta.getInstance(objectId).setVisible(true);
         }
         case "Dugovanja" -> {
-            DugovanjeKlijenta.getInstance(klijentSeansaId);
-            DugovanjeKlijenta.getInstance(klijentSeansaId).setVisible(true);
+            DugovanjeKlijenta.getInstance(objectId);
+            DugovanjeKlijenta.getInstance(objectId).setVisible(true);
         }
         case "Vise" -> {
-            SeansaScreen.getInstance(klijentSeansaId);
-            SeansaScreen.getInstance(klijentSeansaId).setVisible(true);
+            SeansaScreen.getInstance(objectId);
+            SeansaScreen.getInstance(objectId).setVisible(true);
+        }
+        case "Seanse" -> {
+            KandidatSeanseFrame.getInstance(objectId);
+            KandidatSeanseFrame.getInstance(objectId).setVisible(true);
         }
     }
     fireEditingStopped();
